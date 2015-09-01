@@ -20,3 +20,15 @@ Reed Slobodin - praise cthulhu
 
 Reed Slobodin - praise cthulhu
 Ian Kronquist
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+Stasiek ^^
+=======
+>>>>>>> origin/master
+>>>>>>> origin/master
+=======
+
+>>>>>>> origin/master
+=======
+>>>>>>> origin/master
