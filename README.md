@@ -7,5 +7,3 @@ Reed Slobodin - praise cthulhu
 Ian Kronquist
 
 Stasiek ^^
-
-
