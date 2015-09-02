@@ -16,7 +16,7 @@ What are these tools?
   (on GitHub's computers) so you can all keep an up to date copy of your files
   in one place.
 
-* GitHub Desktop is the command line application you are using.
+* GitHub Desktop is the desktop application you are using.
 
 * You can see the current state of the repository on [the GitHub website](https://github.com/iankronquist/fellowshipoftherobot).
 
