@@ -61,7 +61,9 @@ public class K9Line extends OpMode {
 		//motorLeft.setDirection(DcMotor.Direction.REVERSE);
 		DebrisMotor = hardwareMap.dcMotor.get("DebrisMotor");
         DebrisMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-
+		//may need a wait
+		DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        DebrisMotor.setTargetPosition(0);
 	}
 	@Override
 	public void loop() {
@@ -71,18 +73,17 @@ public class K9Line extends OpMode {
 		float right = throttle - direction;
 		float left = throttle + direction;
         //joystick reads from -127 to 128
-       /* float position = gamepad1.right_stick_x;
+       float position = gamepad1.right_stick_x;
 		float maxAngle = 30; //maximum angle allowed
-        float gearboxRatio = 60;
         float EncoderPerRotation = 1680;//move these to be a one time calc
         //changing max angle allowed from degrees to encoder units
-        float EncoderMax = (maxAngle/360)*EncoderPerRotation*gearboxRatio;
+        float EncoderMax = (maxAngle/360)*EncoderPerRotation;
         //scaling position to have the max value as the max angle
-		int TargetEncoderValue = (int)(position*EncoderMax/127);
-        DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        DebrisMotor.setTargetPosition(TargetEncoderValue);*/
-
-
+		int TargetEncoderValue = (int)(position*EncoderMax);
+        //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        DebrisMotor.setTargetPosition(TargetEncoderValue);
+telemetry.addData("target", TargetEncoderValue);
+        telemetry.addData("encoder position", DebrisMotor.getCurrentPosition());
 
 		// clip the right/left values so that the values never exceed +/- 1
 		right = Range.clip(right, -1, 1);
@@ -92,7 +93,6 @@ public class K9Line extends OpMode {
 		// the robot more precisely at slower speeds.
 		right = (float)scaleInput(right);
 		left =  (float)scaleInput(left);
-        DebrisMotor.setPower(1);
 
 		// write the values to the motors
 		motorRight.setPower(left);
