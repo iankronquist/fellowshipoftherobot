@@ -64,6 +64,7 @@ public class K9Line extends OpMode {
 		//may need a wait
 		DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
+        DebrisMotor.setPower(.1);
 	}
 	@Override
 	public void loop() {
@@ -82,7 +83,7 @@ public class K9Line extends OpMode {
 		int TargetEncoderValue = (int)(position*EncoderMax);
         //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(TargetEncoderValue);
-telemetry.addData("target", TargetEncoderValue);
+        telemetry.addData("target", TargetEncoderValue);
         telemetry.addData("encoder position", DebrisMotor.getCurrentPosition());
 
 		// clip the right/left values so that the values never exceed +/- 1
