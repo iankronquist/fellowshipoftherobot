@@ -74,7 +74,7 @@ public class K9Line extends OpMode {
        /* float position = gamepad1.right_stick_x;
 		float maxAngle = 30; //maximum angle allowed
         float gearboxRatio = 60;
-        float EncoderPerRotation = 280;//move these to be a one time calc
+        float EncoderPerRotation = 1680;//move these to be a one time calc
         //changing max angle allowed from degrees to encoder units
         float EncoderMax = (maxAngle/360)*EncoderPerRotation*gearboxRatio;
         //scaling position to have the max value as the max angle
