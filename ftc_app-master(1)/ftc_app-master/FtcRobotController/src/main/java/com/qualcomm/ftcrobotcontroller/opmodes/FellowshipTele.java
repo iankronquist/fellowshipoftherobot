@@ -22,6 +22,9 @@ public class FellowshipTele extends OpMode {
     Servo LiftServo;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 35;
+    final double triggerCutoff = .2;
+    final double servoIncrement = .001;
+    final double power = .9;
     /**
      * Constructor
      */
@@ -41,7 +44,7 @@ public class FellowshipTele extends OpMode {
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
-        DebrisMotor.setPower(.05);
+        DebrisMotor.setPower(.005);
         //LeftZipline = hardwareMap.servo.get("LeftZipline");
         //RightZipline = hardwareMap.servo.get("RightZipline");
         //RightZipline.setDirection(Servo.Direction.REVERSE);
@@ -51,7 +54,6 @@ public class FellowshipTele extends OpMode {
     public void loop() {
         //drive code
         //may need change. this is from K9TeleOp
-
         float throttle = -gamepad1.left_stick_y;
         float direction = gamepad1.left_stick_x;
         float right = throttle - direction;
@@ -70,9 +72,9 @@ public class FellowshipTele extends OpMode {
 
         //lift servo code
         if(gamepad1.dpad_up){
-            LiftServo.setPosition(LiftServo.getPosition()+.0001);
+            LiftServo.setPosition(LiftServo.getPosition()+servoIncrement);
         }else if(gamepad1.dpad_down){
-            LiftServo.setPosition(LiftServo.getPosition()-.0001);
+            LiftServo.setPosition(LiftServo.getPosition()-servoIncrement);
         }else{
             LiftServo.setPosition(LiftServo.getPosition());
         }
@@ -113,13 +115,12 @@ public class FellowshipTele extends OpMode {
 
 
 
-
         //Roller Code
         //when trigger is pressed, power is set
-        if(gamepad1.right_trigger>.2){
-            RollerMotor.setPower(.9);
-        }else if(gamepad1.left_trigger>.2){
-            RollerMotor.setPower(-.9);
+        if(gamepad1.right_trigger>triggerCutoff){
+            RollerMotor.setPower(power);
+        }else if(gamepad1.left_trigger>triggerCutoff){
+            RollerMotor.setPower(-power);
         }else{
             RollerMotor.setPower(0);
         }
