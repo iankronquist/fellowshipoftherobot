@@ -95,6 +95,14 @@ public class FellowshipTele extends OpMode {
         }else{
             RollerMotor.setPower(0);
         }
+        if(gamepad1.x=true)
+        {
+            ZiplineLeft.setPosition(1);
+        }
+        if(gamepad1.b=true)
+        {
+            ZiplineRight.setPosition(1);
+        }
     }
 
     /*
