@@ -21,7 +21,7 @@ public class FellowshipTele extends OpMode {
     //Servo RightZipline;
     Servo LiftServo;
     final float EncoderPerRotation = 1680;
-    final float maxAngle = 30;
+    final float maxAngle = 35;
     /**
      * Constructor
      */
