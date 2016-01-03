@@ -56,6 +56,7 @@ public class FellowshipTele extends OpMode {
         DebrisMotor.setTargetPosition(TargetEncoderValue);
         telemetry.addData("target", TargetEncoderValue);
         telemetry.addData("encoder position", DebrisMotor.getCurrentPosition());
+        telemetry.addData("trigger value", gamepad1.right_trigger);
 
         if(gamepad1.right_trigger>5){
             RollerMotor.setPower(1);
