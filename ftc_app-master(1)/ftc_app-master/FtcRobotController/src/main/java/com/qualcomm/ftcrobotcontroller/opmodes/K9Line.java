@@ -47,6 +47,8 @@ public class K9Line extends OpMode {
 	DcMotor motorRight;
 	//DcMotor motorLeft;
 	DcMotor DebrisMotor;
+	final float EncoderPerRotation = 1680;
+	final float maxAngle = 30;
 	/**
 	 * Constructor
 	 */
@@ -73,10 +75,8 @@ public class K9Line extends OpMode {
 		float direction = gamepad1.left_stick_x;
 		float right = throttle - direction;
 		float left = throttle + direction;
-        //joystick reads from -127 to 128
+        //joystick reads from -1 to 1 on each axis
        float position = gamepad1.right_stick_x;
-		float maxAngle = 30; //maximum angle allowed
-        float EncoderPerRotation = 1680;//move these to be a one time calc
         //changing max angle allowed from degrees to encoder units
         float EncoderMax = (maxAngle/360)*EncoderPerRotation;
         //scaling position to have the max value as the max angle
