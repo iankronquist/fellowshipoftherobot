@@ -52,7 +52,6 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 package com.qualcomm.ftcrobotcontroller.opmodes;
-import com.kauailabs.navx.ftc.AHRS;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -61,7 +60,6 @@ public class K9TeleOp extends OpMode {
     DcMotor motorRight;
     DcMotor motorLeft;
     private final int NAVX_DIM_I2C_PORT = 0;
-    private AHRS navx_device;
 
     private float displacement[] = new float[2];
     private float last_velocity[] = new float[2];
@@ -94,9 +92,6 @@ public class K9TeleOp extends OpMode {
     @Override
     public void init() {
 
-        navx_device = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("Core Interface Module 1"),
-                NAVX_DIM_I2C_PORT,
-                AHRS.DeviceDataType.kProcessedData);
         motorRight = hardwareMap.dcMotor.get("motor_2");
         motorLeft = hardwareMap.dcMotor.get("motor_1");
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -105,13 +100,6 @@ public class K9TeleOp extends OpMode {
 
     @Override
     public void loop() {
-        boolean connected = navx_device.isConnected();
-        telemetry.addData("1 navX-Device", connected ?
-                "Connected" : "Disconnected" );
-        updateDisplacement(navx_device.getWorldLinearAccelX(), navx_device.getWorldLinearAccelY(), navx_device.getActualUpdateRate(), navx_device.isMoving());
-        telemetry.addData("DisY", getDisplacementY());
-        telemetry.addData("VelY", last_velocity[1]);
-        telemetry.addData("AccelY", navx_device.getWorldLinearAccelY());
         motorRight.setPower(0);
         motorLeft.setPower(0);
 
