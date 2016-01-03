@@ -17,6 +17,8 @@ public class FellowshipTele extends OpMode {
     DcMotor motorLeft;
     DcMotor DebrisMotor;
     DcMotor RollerMotor;
+    DcServo ZiplineLeft;
+    DcServo ZiplineRight;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 30;
     /**
@@ -39,6 +41,8 @@ public class FellowshipTele extends OpMode {
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
         DebrisMotor.setPower(.1);
+        ZiplineLeft.setPosition(0.5);
+        ZiplineRight.setPosition(0.5);
     }
     @Override
     public void loop() {
