@@ -17,8 +17,8 @@ public class FellowshipTele extends OpMode {
     DcMotor motorLeft;
     DcMotor DebrisMotor;
     DcMotor RollerMotor;
-    DcServo ZiplineLeft;
-    DcServo ZiplineRight;
+    Servo ZiplineLeft;
+    Servo ZiplineRight;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 30;
     /**
