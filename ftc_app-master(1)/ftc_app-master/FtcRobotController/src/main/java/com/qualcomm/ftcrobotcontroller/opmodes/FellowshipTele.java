@@ -17,8 +17,9 @@ public class FellowshipTele extends OpMode {
     DcMotor motorLeft;
     DcMotor DebrisMotor;
     DcMotor RollerMotor;
-    DcServo ZiplineLeft;
-    DcServo ZiplineRight;
+    //Servo LeftZipline;
+    //Servo RightZipline;
+    Servo LiftServo;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 30;
     /**
@@ -40,9 +41,11 @@ public class FellowshipTele extends OpMode {
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
-        DebrisMotor.setPower(.1);
-        ZiplineLeft.setPosition(0.5);
-        ZiplineRight.setPosition(0.5);
+        DebrisMotor.setPower(.05);
+        //LeftZipline = hardwareMap.servo.get("LeftZipline");
+        //RightZipline = hardwareMap.servo.get("RightZipline");
+        //RightZipline.setDirection(Servo.Direction.REVERSE);
+        LiftServo = hardwareMap.servo.get("LiftServo");
     }
     @Override
     public void loop() {
@@ -63,6 +66,35 @@ public class FellowshipTele extends OpMode {
         // write the values to the motors
         motorRight.setPower(left);
         motorLeft.setPower(right);
+
+
+        //lift servo code
+        if(gamepad1.dpad_up){
+            LiftServo.setPosition(LiftServo.getPosition()+.0001);
+        }else if(gamepad1.dpad_down){
+            LiftServo.setPosition(LiftServo.getPosition()-.0001);
+        }else{
+            LiftServo.setPosition(LiftServo.getPosition());
+        }
+
+
+
+
+
+
+        //zipline servo code
+        /*if(gamepad1.x){
+           LeftZipline.setPosition(.5);
+        }else{
+            LeftZipline.setPosition(0);
+        }
+        if(gamepad1.b){
+            RightZipline.setPosition(.5);
+        }else{
+            RightZipline.setPosition(0);
+        }*/
+
+
 
 
 
@@ -86,11 +118,7 @@ public class FellowshipTele extends OpMode {
         //when trigger is pressed, power is set
         if(gamepad1.right_trigger>.2){
             RollerMotor.setPower(.9);
-        }else{
-            //trigger not pressed motor power set to 0
-            RollerMotor.setPower(0);
-        }
-        if(gamepad1.left_trigger>.2){
+        }else if(gamepad1.left_trigger>.2){
             RollerMotor.setPower(-.9);
         }else{
             RollerMotor.setPower(0);
