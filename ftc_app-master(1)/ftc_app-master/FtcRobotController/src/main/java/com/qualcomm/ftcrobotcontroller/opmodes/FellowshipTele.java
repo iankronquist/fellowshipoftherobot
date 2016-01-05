@@ -29,7 +29,6 @@ public class FellowshipTele extends OpMode {
     final float maxAngle = 35;
     final double triggerCutoff = .2;
     final double power = .9;
-    final double searchingPower = 0.1;
     boolean RightDown = false;
     boolean LeftDown = false;
 
@@ -37,14 +36,14 @@ public class FellowshipTele extends OpMode {
 
 
     public void RollerStop() {
-        if (rollerPhotogate.getValue() >= 500)//photogate blocked?
+        if (rollerPhotogate.getValue() >= 1000)//photogate blocked?
         {
             RollerMotor.setPower(0); //stop motor
         } else if (RollerMotor.getPower() > 0) //motor turning with positive power?
         {
-            RollerMotor.setPower(searchingPower); //set to low positive power to find flag
+            RollerMotor.setPower(.1); //set to low positive power to find flag
         } else {
-            RollerMotor.setPower(-searchingPower);//motor must be turning with negative power, so it is set to low negative power to search for flag.
+            RollerMotor.setPower(-.1);//motor must be turning with negative power, so it is set to low negative power to search for flag.
         }
     }
 
@@ -156,9 +155,6 @@ public class FellowshipTele extends OpMode {
 
 
         //zipline servo code
-        //this is a continuous rotation servo
-        //for a continous rotation servo, 0 is spin one direction full power, 1 is the other direction full power
-        //and 0.5 is stopped.
         if(gamepad1.x)
             if(!LeftDown){
                 LeftZipline.setPosition(1);
@@ -190,7 +186,10 @@ public class FellowshipTele extends OpMode {
         //scaling position to have the max value as the max angle
         int TargetEncoderValue = (int)(position*EncoderMax);
         //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-
+        DebrisMotor.setTargetPosition(TargetEncoderValue);
+        telemetry.addData("target", TargetEncoderValue);
+        telemetry.addData("encoder position", DebrisMotor.getCurrentPosition());
+        telemetry.addData("trigger value", gamepad1.right_trigger);
 
 
 
@@ -203,13 +202,6 @@ public class FellowshipTele extends OpMode {
         }else{
             RollerStop();
         }
-        //telemetry
-        DebrisMotor.setTargetPosition(TargetEncoderValue);
-        telemetry.addData("target", TargetEncoderValue);
-        telemetry.addData("encoder position", DebrisMotor.getCurrentPosition());
-        telemetry.addData("trigger value", gamepad1.right_trigger);
-        telemetry.addData("rollerPhotogate:", rollerPhotogate.getValue());
-        telemetry.addData("rollerMotor", RollerMotor.getPower());
     }
 
     /*
