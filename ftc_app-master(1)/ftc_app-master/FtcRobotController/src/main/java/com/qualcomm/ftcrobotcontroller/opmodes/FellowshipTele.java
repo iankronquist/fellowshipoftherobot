@@ -1,7 +1,9 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -17,17 +19,40 @@ public class FellowshipTele extends OpMode {
     DcMotor motorLeft;
     DcMotor DebrisMotor;
     DcMotor RollerMotor;
-    //Servo LeftZipline;
-    //Servo RightZipline;
+    Servo LeftZipline;
+    Servo RightZipline;
     Servo LiftServo;
+    AnalogInput rollerPhotogate;
+    int HopperPosition = 0;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 35;
     final double triggerCutoff = .2;
-    final double servoIncrement = .001;
     final double power = .9;
-    /**
-     * Constructor
-     */
+    boolean RightDown = false;
+    boolean LeftDown = false;
+
+
+
+
+    public void RollerStop() {
+        if (rollerPhotogate.getValue() >= 1000)//photogate blocked?
+        {
+            RollerMotor.setPower(0); //stop motor
+        } else if (RollerMotor.getPower() > 0) //motor turning with positive power?
+        {
+            RollerMotor.setPower(.1); //set to low positive power to find flag
+        } else {
+            RollerMotor.setPower(-.1);//motor must be turning with negative power, so it is set to low negative power to search for flag.
+        }
+    }
+
+
+    public void HopperRaise(){
+        LiftServo.setPosition(0);
+    }
+
+
+
     public FellowshipTele() {
 
     }
@@ -44,11 +69,15 @@ public class FellowshipTele extends OpMode {
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
-        DebrisMotor.setPower(.005);
-        //LeftZipline = hardwareMap.servo.get("LeftZipline");
-        //RightZipline = hardwareMap.servo.get("RightZipline");
-        //RightZipline.setDirection(Servo.Direction.REVERSE);
+        DebrisMotor.setPower(.05);
+        LeftZipline = hardwareMap.servo.get("LeftZipline");
+        RightZipline = hardwareMap.servo.get("RightZipline");
+        RightZipline.setDirection(Servo.Direction.REVERSE);
         LiftServo = hardwareMap.servo.get("LiftServo");
+        LeftZipline.setPosition(.5);
+        RightZipline.setPosition(.5);
+        rollerPhotogate=hardwareMap.analogInput.get("rollerPhotogate");
+
     }
     @Override
     public void loop() {
@@ -71,13 +100,26 @@ public class FellowshipTele extends OpMode {
 
 
         //lift servo code
-        if(gamepad1.dpad_up){
-            LiftServo.setPosition(LiftServo.getPosition()+servoIncrement);
+       /* if(gamepad1.dpad_up){
+            LiftServo.setPosition(0);
         }else if(gamepad1.dpad_down){
-            LiftServo.setPosition(LiftServo.getPosition()-servoIncrement);
+            LiftServo.setPosition(1);
         }else{
-            LiftServo.setPosition(LiftServo.getPosition());
+            LiftServo.setPosition(0.48);
+        }*/
+
+
+        if(gamepad1.dpad_up){
+            if(HopperPosition != 2){
+                HopperPosition++;
+            }
         }
+        if(gamepad1.dpad_down){
+            if (HopperPosition != 0){
+                HopperPosition--;
+            }
+        }
+
 
 
 
@@ -85,16 +127,24 @@ public class FellowshipTele extends OpMode {
 
 
         //zipline servo code
-        /*if(gamepad1.x){
-           LeftZipline.setPosition(.5);
-        }else{
-            LeftZipline.setPosition(0);
-        }
-        if(gamepad1.b){
-            RightZipline.setPosition(.5);
-        }else{
-            RightZipline.setPosition(0);
-        }*/
+        if(gamepad1.x)
+            if(!LeftDown){
+                LeftZipline.setPosition(1);
+                LeftDown = true;
+            }else{
+                LeftZipline.setPosition(.5);
+                LeftDown = false;
+            }
+
+        if(gamepad1.b)
+            if(!RightDown){
+                RightZipline.setPosition(1);
+                RightDown = true;
+            }else{
+                RightZipline.setPosition(.5);
+                RightDown = false;
+            }
+
 
 
 
@@ -122,7 +172,7 @@ public class FellowshipTele extends OpMode {
         }else if(gamepad1.left_trigger>triggerCutoff){
             RollerMotor.setPower(-power);
         }else{
-            RollerMotor.setPower(0);
+            RollerStop();
         }
     }
 
