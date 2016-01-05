@@ -56,7 +56,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
-public class K9TeleOp extends OpMode {
+public class K9Op extends OpMode {
     DcMotor motorRight;
     DcMotor motorLeft;
     private final int NAVX_DIM_I2C_PORT = 0;

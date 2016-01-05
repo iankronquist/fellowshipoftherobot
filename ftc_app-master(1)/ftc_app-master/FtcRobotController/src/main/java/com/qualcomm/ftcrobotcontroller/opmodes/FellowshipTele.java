@@ -23,6 +23,7 @@ public class FellowshipTele extends OpMode {
     Servo RightZipline;
     Servo LiftServo;
     AnalogInput rollerPhotogate;
+    AnalogInput elevatorPhotogate;
     int HopperPosition = 0;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 35;
@@ -46,6 +47,12 @@ public class FellowshipTele extends OpMode {
         }
     }
 
+    public void ElevatorStop() {
+        if (ElevatorPhotogate.getValue() > 0)
+        {
+            LiftServo.setPower(0);
+        }
+    }
 
     public void HopperRaise(){
         LiftServo.setPosition(0);
@@ -108,7 +115,6 @@ public class FellowshipTele extends OpMode {
             LiftServo.setPosition(0.48);
         }*/
 
-
         if(gamepad1.dpad_up){
             if(HopperPosition != 2){
                 HopperPosition++;
@@ -118,6 +124,10 @@ public class FellowshipTele extends OpMode {
             if (HopperPosition != 0){
                 HopperPosition--;
             }
+        }
+        else
+        {
+            ElevatorStop();
         }
 
 
