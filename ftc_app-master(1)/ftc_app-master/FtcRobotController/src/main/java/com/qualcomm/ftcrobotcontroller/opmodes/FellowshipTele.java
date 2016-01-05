@@ -91,20 +91,38 @@ public class FellowshipTele extends OpMode {
     public void loop() {
         //drive code
         //may need change. this is from K9TeleOp
-        float throttle = -gamepad1.left_stick_y;
-        float direction = gamepad1.left_stick_x;
-        float right = throttle - direction;
-        float left = throttle + direction;
-        // clip the right/left values so that the values never exceed +/- 1
-        right = Range.clip(right, -1, 1);
-        left = Range.clip(left, -1, 1);
-        // scale the joystick value to make it easier to control
-        // the robot more precisely at slower speeds.
-        right = (float)scaleInput(right);
-        left =  (float)scaleInput(left);
-        // write the values to the motors
-        motorRight.setPower(left);
-        motorLeft.setPower(right);
+        if(gamepad1.left_stick_button){
+            float throttle = -gamepad1.left_stick_y;
+            float direction = gamepad1.left_stick_x;
+            float right = throttle - direction;
+            float left = throttle + direction;
+            // clip the right/left values so that the values never exceed +/- 1
+            right = Range.clip(right, -.2, .2);
+            left = Range.clip(left, -.2, .2);
+            // scale the joystick value to make it easier to control
+            // the robot more precisely at slower speeds.
+            right = (float)scaleInput(right);
+            left =  (float)scaleInput(left);
+            // write the values to the motors
+            motorRight.setPower(left);
+            motorLeft.setPower(right);}
+    }
+        else if(gamepad1.right_stick_button){
+            float throttle = -gamepad1.left_stick_y;
+            float direction = gamepad1.left_stick_x;
+            float right = throttle - direction;
+            float left = throttle + direction;
+            // clip the right/left values so that the values never exceed +/- 1
+            right = Range.clip(right, -1, 1);
+            left = Range.clip(left, -1, 1);
+            // scale the joystick value to make it easier to control
+            // the robot more precisely at slower speeds.
+            right = (float)scaleInput(right);
+            left =  (float)scaleInput(left);
+            // write the values to the motors
+            motorRight.setPower(left);
+            motorLeft.setPower(right);}
+
 
 
         //lift servo code
