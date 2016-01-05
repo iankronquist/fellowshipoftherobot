@@ -21,9 +21,12 @@ public class FellowshipTele extends OpMode {
     //Servo RightZipline;
     Servo LiftServo;
 <<<<<<< HEAD
+<<<<<<< HEAD
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     int HopperPosition = 0;
+=======
+>>>>>>> parent of ac80adf... added photogate code. edited elevator servo
 =======
 >>>>>>> parent of ac80adf... added photogate code. edited elevator servo
     final float EncoderPerRotation = 1680;
@@ -31,6 +34,7 @@ public class FellowshipTele extends OpMode {
     final double triggerCutoff = .2;
     final double servoIncrement = .001;
     final double power = .9;
+<<<<<<< HEAD
 <<<<<<< HEAD
     boolean RightDown = false;
     boolean LeftDown = false;
@@ -63,6 +67,11 @@ public class FellowshipTele extends OpMode {
 
 
 
+=======
+    /**
+     * Constructor
+     */
+>>>>>>> parent of ac80adf... added photogate code. edited elevator servo
 =======
     /**
      * Constructor
@@ -135,6 +144,7 @@ public class FellowshipTele extends OpMode {
             LiftServo.setPosition(LiftServo.getPosition()-servoIncrement);
         }else{
 <<<<<<< HEAD
+<<<<<<< HEAD
             LiftServo.setPosition(0.48);
         }*/
 
@@ -154,8 +164,10 @@ public class FellowshipTele extends OpMode {
         else
         {
             ElevatorStop();
+=======
+            LiftServo.setPosition(LiftServo.getPosition());
+>>>>>>> parent of ac80adf... added photogate code. edited elevator servo
         }
-
 
 
 
