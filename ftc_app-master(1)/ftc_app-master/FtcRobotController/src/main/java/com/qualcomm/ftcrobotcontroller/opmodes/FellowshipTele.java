@@ -1,5 +1,6 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.util.Range;
@@ -17,14 +18,44 @@ public class FellowshipTele extends OpMode {
     DcMotor motorLeft;
     DcMotor DebrisMotor;
     DcMotor RollerMotor;
-    Servo ZiplineLeft;
-    Servo ZiplineRight;
+    Servo LeftZipline;
+    Servo RightZipline;
+    Servo LiftServo;
+    AnalogInput rollerPhotogate;
+    AnalogInput elevatorPhotogate;
+    int HopperPosition = 0;
     final float EncoderPerRotation = 1680;
-    final float maxAngle = 30;
+    final float maxAngle = 35;
+    final double triggerCutoff = .2;
+    final double power = .9;
+    final double searchingPower = 0.1;
+    boolean RightDown = false;
+    boolean LeftDown = false;
 
-    /**
-     * Constructor
-     */
+    public void RollerStop() {
+        if(rollerPhotogate.getValue() >= 500)//photogate blocked?
+        {
+            RollerMotor.setPower(0);//stop motor
+        } else if(RollerMotor.getPower() > 0) //motor turning with positive power?
+        {
+            RollerMotor.setPower(searchingPower); //set to low power to find flag
+        } else {
+            RollerMotor.setPower(-searchingPower);
+        }
+    }
+
+    public void ElevatorStop() {
+        if(elevatorPhotogate.getValue() > 28){
+            LiftServo.setPosition(.5);
+        }
+    }
+    // public void HopperRaise(){LiftServo.setPosition(0);}
+
+
+
+
+
+
     public FellowshipTele() {
 
     }
@@ -41,18 +72,82 @@ public class FellowshipTele extends OpMode {
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
-        DebrisMotor.setPower(.1);
-        ZiplineLeft.setPosition(0.5);
-        ZiplineRight.setPosition(0.5);
+        DebrisMotor.setPower(.05);
+        LeftZipline = hardwareMap.servo.get("LeftZipline");
+        RightZipline = hardwareMap.servo.get("RightZipline");
+        RightZipline.setDirection(Servo.Direction.REVERSE);
+        LiftServo = hardwareMap.servo.get("LiftServo");
+        LeftZipline.setPosition(0.5);
+        RightZipline.setPosition(0.5);
     }
 
     @Override
     public void loop() {
 
+        //drive code
+        //may need change, this is from FTC
         float throttle = -gamepad1.left_stick_y;
         float direction = gamepad1.left_stick_x;
-        float right = throttle - direction;
-        float left = throttle + direction;
+        float right = throttle-direction;
+        float left = throttle+direction;
+        right = Range.clip(right, -1, 1);
+        left = Range.clip(left, -1, 1);
+        right = (float)scaleInput(right);
+        left = (float)scaleInput(left);
+        motorRight.setPower(left);
+        motorLeft.setPower(right);
+
+        //lift servo code
+        //this is a continuous rotation servo
+        //for a continuous rotation servo, 0 is spin one direction full power, 1 is the other direction full power
+        //and 0.5 is stopped.
+        /* if(gamepad1.dpad_up){
+            LiftServo.setPosition(0);
+        } else if(gamepad1.dpad_down){
+        LiftServo.setPosition(1);
+        }else{
+        LiftServo.setPosition(0.5);
+         */
+        if (gamepad1.dpad_up) {
+
+            if (HopperPosition != 2) {
+                HopperPosition++;
+            }
+        }
+        if(gamepad1.dpad_down) {
+            if (HopperPosition != 0) {
+                HopperPosition--;
+            }
+        }
+        else
+        {
+            ElevatorStop();
+        }
+
+
+
+        //zipline servo code
+
+        if(gamepad1.x)
+            if(!LeftDown) {
+                LeftZipline.setPosition(1);
+                LeftDown = true;
+            }else{
+                LeftZipline.setPosition(0.5);
+                LeftDown = false;
+            }
+        if(gamepad1.b)
+            if(!RightDown) {
+                RightZipline.setPosition(1);
+                RightDown = true;
+            }else{
+                RightZipline.setPosition(.5);
+                RightDown = false;
+            }
+
+
+
+        //Bucket Tilting code
         //joystick reads from -1 to 1 on each axis
         float position = gamepad1.right_stick_x;
         //changing max angle allowed from degrees to encoder units
@@ -61,31 +156,27 @@ public class FellowshipTele extends OpMode {
         int TargetEncoderValue = (int)(position*EncoderMax);
         //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(TargetEncoderValue);
-        telemetry.addData("target", TargetEncoderValue);
-        telemetry.addData("encoder position", DebrisMotor.getCurrentPosition());
 
-        // clip the right/left values so that the values never exceed +/- 1
-        right = Range.clip(right, -1, 1);
-        left = Range.clip(left, -1, 1);
 
-        // scale the joystick value to make it easier to control
-        // the robot more precisely at slower speeds.
-        right = (float)scaleInput(right);
-        left =  (float)scaleInput(left);
 
-        // write the values to the motors
-        motorRight.setPower(left);
-        motorLeft.setPower(right);
+
+
+        //Roller Code
+        //when trigger is pressed, power is set
+        if(gamepad1.right_trigger>triggerCutoff) {
+            RollerMotor.setPower(power);
+        } else if(gamepad1.left_trigger>triggerCutoff) {
+            RollerMotor.setPower(-power);
+        }else{
+            RollerStop();
+        }
+        //telemetry section
+        
 
 
 }
 
 
-    /*
-     * Code to run when the op mode is first disabled goes here
-     *
-     * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
-     */
     @Override
     public void stop() {
 
