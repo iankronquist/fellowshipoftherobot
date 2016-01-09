@@ -56,47 +56,26 @@ public class FellowshipTele extends OpMode {
         //joystick reads from -1 to 1 on each axis
         float position = gamepad1.right_stick_x;
         //changing max angle allowed from degrees to encoder units
-        float EncoderMax = (maxAngle / 360) * EncoderPerRotation;
+        float EncoderMax = (maxAngle/360)*EncoderPerRotation;
         //scaling position to have the max value as the max angle
-        int TargetEncoderValue = (int) (position * EncoderMax);
+        int TargetEncoderValue = (int)(position*EncoderMax);
         //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(TargetEncoderValue);
         telemetry.addData("target", TargetEncoderValue);
         telemetry.addData("encoder position", DebrisMotor.getCurrentPosition());
-        telemetry.addData("trigger value", gamepad1.right_trigger);
 
-        if (gamepad1.right_trigger > 5) {
-            RollerMotor.setPower(1);
-        } else {
-            RollerMotor.setPower(0);
+        // clip the right/left values so that the values never exceed +/- 1
+        right = Range.clip(right, -1, 1);
+        left = Range.clip(left, -1, 1);
 
-        }
+        // scale the joystick value to make it easier to control
+        // the robot more precisely at slower speeds.
+        right = (float)scaleInput(right);
+        left =  (float)scaleInput(left);
 
-        if (gamepad1.x = true) {
-            ZiplineLeft.setPosition(1);
-        }
-        if (gamepad1.b = true) {
-            ZiplineRight.setPosition(1);
-        }
-
-
-    // clip the right/left values so that the values never exceed +/- 1
-    right=Range.clip(right,-1,1);
-    left=Range.clip(left,-1,1);
-
-    // scale the joystick value to make it easier to control
-    // the robot more precisely at slower speeds.
-    right=(float)
-
-    scaleInput(right);
-
-    left=(float)
-
-    scaleInput(left);
-
-    // write the values to the motors
-    motorRight.setPower(left);
-    motorLeft.setPower(right);
+        // write the values to the motors
+        motorRight.setPower(left);
+        motorLeft.setPower(right);
 
 
 }
