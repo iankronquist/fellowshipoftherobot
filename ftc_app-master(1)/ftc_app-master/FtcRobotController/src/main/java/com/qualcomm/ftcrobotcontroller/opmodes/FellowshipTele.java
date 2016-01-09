@@ -26,10 +26,10 @@ public class FellowshipTele extends OpMode {
     final double triggerCutoff = .2;
     final double power = .9;
     final double searchingPower = 0.1;
-    float smallPower;
+    float smallPower = (1/5);
     boolean RightDown = false;
     boolean LeftDown = false;
-    boolean climbersFlipped=false;
+    //boolean climbersFlipped=false;
 
     public void RollerStop() {
         if(rollerPhotogate.getValue() >= 500)//photogate blocked?
@@ -43,7 +43,7 @@ public class FellowshipTele extends OpMode {
         }
     }
 
-    public void ElevatorStop() {
+    /*public void ElevatorStop() {
         if(elevatorPhotogate.getValue() > 28){
             LiftServo.setPosition(.5);
         }
@@ -59,13 +59,15 @@ public class FellowshipTele extends OpMode {
         do{
             LiftServo.setPosition(1);
         }while(elevatorPhotogate.getValue()<300);
-    }
+    }*/
 
-    public void flipClimbers(){
+   /* public void flipClimbers(){
         ClimberServo.setPosition(1);
-        for(int i =0; i<25; i++){}
+        for(int i =0; i<25; i++){
+            i+=.5;
+        }
         ClimberServo.setPosition(.5);
-    }
+    }*/
 
 
 
@@ -96,6 +98,7 @@ public class FellowshipTele extends OpMode {
         LeftZipline.setPosition(0.5);
         RightZipline.setPosition(0.5);
         ClimberServo = hardwareMap.servo.get("ClimberServo");
+        ClimberServo.setPosition(0.5);
     }
 
     @Override
@@ -108,10 +111,10 @@ public class FellowshipTele extends OpMode {
             float direction = gamepad1.left_stick_x;
             float right = throttle - direction;
             float left = throttle + direction;
-            right = Range.clip(right, -smallPower, smallPower);
-            left = Range.clip(left, -smallPower, smallPower);
-            right = (float) scaleInput(right);
-            left = (float) scaleInput(left);
+            right = Range.clip(right, -1, 1);
+            left = Range.clip(left, -1, 1);
+            right = smallPower*(float)scaleInput(right);
+            left = smallPower*(float)scaleInput(left);
             motorRight.setPower(left);
             motorLeft.setPower(right);
 
@@ -139,10 +142,9 @@ public class FellowshipTele extends OpMode {
         }else{
         LiftServo.setPosition(0.5);
          */
-            if (gamepad1.dpad_up) {
+            /*if (gamepad1.dpad_up) {
 
                 if (HopperPosition != 2) {
-                 LiftServo.setPosition(0);
                     HopperRaise();
             }
             }
@@ -152,7 +154,7 @@ public class FellowshipTele extends OpMode {
                 }
             } else {
                 ElevatorStop();
-            }
+            }*/
 
 
             //zipline servo code
@@ -180,7 +182,7 @@ public class FellowshipTele extends OpMode {
             //changing max angle allowed from degrees to encoder units
             float EncoderMax = (maxAngle / 360) * EncoderPerRotation;
             //scaling position to have the max value as the max angle
-            int TargetEncoderValue = (int) (position * EncoderMax);
+            int TargetEncoderValue = (int)(position * EncoderMax);
             //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
             DebrisMotor.setTargetPosition(TargetEncoderValue);
 
@@ -196,11 +198,11 @@ public class FellowshipTele extends OpMode {
             }
 
         //Climber code
-        if(climbersFlipped&&gamepad1.left_bumper)
+        /*if(climbersFlipped&&gamepad1.left_bumper)
         {
             flipClimbers();
             climbersFlipped = true;
-        }
+        }*/
 
 
 
