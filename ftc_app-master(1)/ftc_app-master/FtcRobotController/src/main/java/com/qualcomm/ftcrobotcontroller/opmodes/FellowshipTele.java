@@ -66,8 +66,9 @@ public class FellowshipTele extends OpMode {
             RollerMotor.setPower(1);
         }else{
             RollerMotor.setPower(0);
+
         }
-<<<<<<< HEAD
+
         if(gamepad1.x=true)
         {
             ZiplineLeft.setPosition(1);
@@ -76,24 +77,10 @@ public class FellowshipTele extends OpMode {
         {
             ZiplineRight.setPosition(1);
         }
-=======
+        
 
-        // clip the right/left values so that the values never exceed +/- 1
-        right = Range.clip(right, -1, 1);
-        left = Range.clip(left, -1, 1);
-
-        // scale the joystick value to make it easier to control
-        // the robot more precisely at slower speeds.
-        right = (float)scaleInput(right);
-        left =  (float)scaleInput(left);
-
-        // write the values to the motors
-        motorRight.setPower(left);
-        motorLeft.setPower(right);
-
-
->>>>>>> parent of e3086db... comments and spacing
     }
+
 
     /*
      * Code to run when the op mode is first disabled goes here
