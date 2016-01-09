@@ -29,6 +29,7 @@ public class FellowshipTele extends OpMode {
     final double triggerCutoff = .2;
     final double power = .9;
     final double searchingPower = 0.1;
+    float smallPower;
     boolean RightDown = false;
     boolean LeftDown = false;
 
@@ -86,21 +87,35 @@ public class FellowshipTele extends OpMode {
 
         //drive code
         //may need change, this is from FTC
-        float throttle = -gamepad1.left_stick_y;
-        float direction = gamepad1.left_stick_x;
-        float right = throttle-direction;
-        float left = throttle+direction;
-        right = Range.clip(right, -1, 1);
-        left = Range.clip(left, -1, 1);
-        right = (float)scaleInput(right);
-        left = (float)scaleInput(left);
-        motorRight.setPower(left);
-        motorLeft.setPower(right);
+        if (gamepad1.left_stick_button) {
+            float throttle = -gamepad1.left_stick_y;
+            float direction = gamepad1.left_stick_x;
+            float right = throttle - direction;
+            float left = throttle + direction;
+            right = Range.clip(right, -smallPower, smallPower);
+            left = Range.clip(left, -smallPower, smallPower);
+            right = (float) scaleInput(right);
+            left = (float) scaleInput(left);
+            motorRight.setPower(left);
+            motorLeft.setPower(right);
 
-        //lift servo code
-        //this is a continuous rotation servo
-        //for a continuous rotation servo, 0 is spin one direction full power, 1 is the other direction full power
-        //and 0.5 is stopped.
+        }else {
+            float throttle = -gamepad1.left_stick_y;
+            float direction = gamepad1.left_stick_x;
+            float right = throttle - direction;
+            float left = throttle + direction;
+            right = Range.clip(right, -1, 1);
+            left = Range.clip(left, -1, 1);
+            right = (float) scaleInput(right);
+            left = (float) scaleInput(left);
+            motorRight.setPower(left);
+            motorLeft.setPower(right);
+        }
+
+            //lift servo code
+            //this is a continuous rotation servo
+            //for a continuous rotation servo, 0 is spin one direction full power, 1 is the other direction full power
+            //and 0.5 is stopped.
         /* if(gamepad1.dpad_up){
             LiftServo.setPosition(0);
         } else if(gamepad1.dpad_down){
@@ -108,75 +123,65 @@ public class FellowshipTele extends OpMode {
         }else{
         LiftServo.setPosition(0.5);
          */
-        if (gamepad1.dpad_up) {
+            if (gamepad1.dpad_up) {
 
-            if (HopperPosition != 2) {
-                HopperPosition++;
+                if (HopperPosition != 2) {
+                    HopperPosition++;
+                }
             }
-        }
-        if(gamepad1.dpad_down) {
-            if (HopperPosition != 0) {
-                HopperPosition--;
-            }
-        }
-        else
-        {
-            ElevatorStop();
-        }
-
-
-
-        //zipline servo code
-
-        if(gamepad1.x)
-            if(!LeftDown) {
-                LeftZipline.setPosition(1);
-                LeftDown = true;
-            }else{
-                LeftZipline.setPosition(0.5);
-                LeftDown = false;
-            }
-        if(gamepad1.b)
-            if(!RightDown) {
-                RightZipline.setPosition(1);
-                RightDown = true;
-            }else{
-                RightZipline.setPosition(.5);
-                RightDown = false;
+            if (gamepad1.dpad_down) {
+                if (HopperPosition != 0) {
+                    HopperPosition--;
+                }
+            } else {
+                ElevatorStop();
             }
 
 
+            //zipline servo code
 
-        //Bucket Tilting code
-        //joystick reads from -1 to 1 on each axis
-        float position = gamepad1.right_stick_x;
-        //changing max angle allowed from degrees to encoder units
-        float EncoderMax = (maxAngle/360)*EncoderPerRotation;
-        //scaling position to have the max value as the max angle
-        int TargetEncoderValue = (int)(position*EncoderMax);
-        //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        DebrisMotor.setTargetPosition(TargetEncoderValue);
+            if (gamepad1.x)
+                if (!LeftDown) {
+                    LeftZipline.setPosition(1);
+                    LeftDown = true;
+                } else {
+                    LeftZipline.setPosition(0.5);
+                    LeftDown = false;
+                }
+            if (gamepad1.b)
+                if (!RightDown) {
+                    RightZipline.setPosition(1);
+                    RightDown = true;
+                } else {
+                    RightZipline.setPosition(.5);
+                    RightDown = false;
+                }
 
 
+            //Bucket Tilting code
+            //joystick reads from -1 to 1 on each axis
+            float position = gamepad1.right_stick_x;
+            //changing max angle allowed from degrees to encoder units
+            float EncoderMax = (maxAngle / 360) * EncoderPerRotation;
+            //scaling position to have the max value as the max angle
+            int TargetEncoderValue = (int) (position * EncoderMax);
+            //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+            DebrisMotor.setTargetPosition(TargetEncoderValue);
 
 
+            //Roller Code
+            //when trigger is pressed, power is set
+            if (gamepad1.right_trigger > triggerCutoff) {
+                RollerMotor.setPower(power);
+            } else if (gamepad1.left_trigger > triggerCutoff) {
+                RollerMotor.setPower(-power);
+            } else {
+                RollerStop();
+            }
+            //telemetry section
 
-        //Roller Code
-        //when trigger is pressed, power is set
-        if(gamepad1.right_trigger>triggerCutoff) {
-            RollerMotor.setPower(power);
-        } else if(gamepad1.left_trigger>triggerCutoff) {
-            RollerMotor.setPower(-power);
-        }else{
-            RollerStop();
+
         }
-        //telemetry section
-        
-
-
-}
-
-
     @Override
     public void stop() {
 
