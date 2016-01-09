@@ -7,11 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-/**
- * TeleOp Mode
- * <p>
- * Enables control of the robot via the gamepad
- */
+
 public class FellowshipTele extends OpMode {
 
     DcMotor motorRight;
@@ -21,6 +17,7 @@ public class FellowshipTele extends OpMode {
     Servo LeftZipline;
     Servo RightZipline;
     Servo LiftServo;
+    Servo ClimberServo;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     int HopperPosition = 0;
@@ -32,6 +29,7 @@ public class FellowshipTele extends OpMode {
     float smallPower;
     boolean RightDown = false;
     boolean LeftDown = false;
+    boolean climbersFlipped=false;
 
     public void RollerStop() {
         if(rollerPhotogate.getValue() >= 500)//photogate blocked?
@@ -50,7 +48,24 @@ public class FellowshipTele extends OpMode {
             LiftServo.setPosition(.5);
         }
     }
-    // public void HopperRaise(){LiftServo.setPosition(0);}
+    public void HopperRaise() {
+
+        do {
+            LiftServo.setPosition(0);
+        } while (elevatorPhotogate.getValue() < 300);
+    }
+
+    public void HopperLower() {
+        do{
+            LiftServo.setPosition(1);
+        }while(elevatorPhotogate.getValue()<300);
+    }
+
+    public void flipClimbers(){
+        ClimberServo.setPosition(1);
+        for(int i =0; i<25; i++){}
+        ClimberServo.setPosition(.5);
+    }
 
 
 
@@ -80,6 +95,7 @@ public class FellowshipTele extends OpMode {
         LiftServo = hardwareMap.servo.get("LiftServo");
         LeftZipline.setPosition(0.5);
         RightZipline.setPosition(0.5);
+        ClimberServo = hardwareMap.servo.get("ClimberServo");
     }
 
     @Override
@@ -126,12 +142,13 @@ public class FellowshipTele extends OpMode {
             if (gamepad1.dpad_up) {
 
                 if (HopperPosition != 2) {
-                    HopperPosition++;
-                }
+                 LiftServo.setPosition(0);
+                    HopperRaise();
+            }
             }
             if (gamepad1.dpad_down) {
                 if (HopperPosition != 0) {
-                    HopperPosition--;
+                    HopperLower();
                 }
             } else {
                 ElevatorStop();
@@ -139,7 +156,6 @@ public class FellowshipTele extends OpMode {
 
 
             //zipline servo code
-
             if (gamepad1.x)
                 if (!LeftDown) {
                     LeftZipline.setPosition(1);
@@ -178,6 +194,18 @@ public class FellowshipTele extends OpMode {
             } else {
                 RollerStop();
             }
+
+        //Climber code
+        if(climbersFlipped&&gamepad1.left_bumper)
+        {
+            flipClimbers();
+            climbersFlipped = true;
+        }
+
+
+
+
+
             //telemetry section
 
 
@@ -194,8 +222,8 @@ public class FellowshipTele extends OpMode {
      * the robot more precisely at slower speeds.
      */
     double scaleInput(double dVal)  {
-        double[] scaleArray = { 0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24,
-                0.30, 0.36, 0.43, 0.50, 0.60, 0.72, 0.85, 1.00, 1.00 };
+            double[] scaleArray = { 0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24,
+                    0.30, 0.36, 0.43, 0.50, 0.60, 0.72, 0.85, 1.00, 1.00 };
 
         // get the corresponding index for the scaleInput array.
         int index = (int) (dVal * 16.0);
