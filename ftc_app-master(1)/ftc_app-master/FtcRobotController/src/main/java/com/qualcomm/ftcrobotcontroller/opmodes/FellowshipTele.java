@@ -20,7 +20,6 @@ public class FellowshipTele extends OpMode {
     Servo ClimberServo;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
-    int HopperPosition = 0;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 35;
     final double triggerCutoff = .2;
@@ -43,29 +42,37 @@ public class FellowshipTele extends OpMode {
         }
     }
 
-    /*public void ElevatorStop() {
-        if(elevatorPhotogate.getValue() > 28){
-            LiftServo.setPosition(.5);
-        }
+    public void ElevatorStop() {
+        LiftServo.setPosition(.5);
     }
     public void HopperRaise() {
-        do {
-            LiftServo.setPosition(0);
-        } while (elevatorPhotogate.getValue() < 300);
+        LiftServo.setPosition(0);
+     if(elevatorPhotogate.getValue()<40){
+         ElevatorStop();
+         LiftServo.setPosition(0);
+         if(elevatorPhotogate.getValue()>=500){
+             ElevatorStop();
+         }else{LiftServo.setPosition(0);}
+     }else{ LiftServo.setPosition(0);}
     }
     public void HopperLower() {
-        do{
+        LiftServo.setPosition(1);
+        if(elevatorPhotogate.getValue()<40){
+            ElevatorStop();
             LiftServo.setPosition(1);
-        }while(elevatorPhotogate.getValue()<300);
-    }*/
+            if(elevatorPhotogate.getValue()>=500){
+                ElevatorStop();
+            }else{LiftServo.setPosition(1);}
+        }else { LiftServo.setPosition(1);}
+    }
 
-   /* public void flipClimbers(){
+   public void flipClimbers(){
         ClimberServo.setPosition(1);
         for(int i =0; i<25; i++){
             i+=.5;
         }
         ClimberServo.setPosition(.5);
-    }*/
+    }
 
 
 
@@ -97,6 +104,8 @@ public class FellowshipTele extends OpMode {
         RightZipline.setPosition(0.5);
         ClimberServo = hardwareMap.servo.get("ClimberServo");
         ClimberServo.setPosition(0.5);
+        rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
+        elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
     }
 
     @Override
@@ -140,18 +149,19 @@ public class FellowshipTele extends OpMode {
         }else{
         LiftServo.setPosition(0.5);
          */
-            /*if (gamepad1.dpad_up) {
-                if (HopperPosition != 2) {
+            if (gamepad1.dpad_up) {
+
                     HopperRaise();
+
             }
-            }
-            if (gamepad1.dpad_down) {
-                if (HopperPosition != 0) {
+            else if (gamepad1.dpad_down) {
+
                     HopperLower();
-                }
+
+
             } else {
                 ElevatorStop();
-            }*/
+            }
 
 
         //zipline servo code
@@ -232,7 +242,7 @@ public class FellowshipTele extends OpMode {
             index = -index;
         }
 
-        // index cannot exceed size of array minus 1.
+        // index cannot exceed size of array qqQSQQqsQSqsQSsminus 1.
         if (index > 16) {
             index = 16;
         }
