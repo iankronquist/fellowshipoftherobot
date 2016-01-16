@@ -46,24 +46,24 @@ public class FellowshipTele extends OpMode {
         LiftServo.setPosition(.5);
     }
     public void HopperRaise() {
-        LiftServo.setPosition(0);
-     if(elevatorPhotogate.getValue()<40){
+        LiftServo.setPosition(.3);
+     if(elevatorPhotogate.getValue()<26){
          ElevatorStop();
-         LiftServo.setPosition(0);
-         if(elevatorPhotogate.getValue()>=500){
+         LiftServo.setPosition(.3);
+         if(elevatorPhotogate.getValue()>=24){
              ElevatorStop();
-         }else{LiftServo.setPosition(0);}
-     }else{ LiftServo.setPosition(0);}
+         }
+     }
     }
     public void HopperLower() {
-        LiftServo.setPosition(1);
-        if(elevatorPhotogate.getValue()<40){
+        LiftServo.setPosition(.7);
+        if(elevatorPhotogate.getValue()<26){
             ElevatorStop();
-            LiftServo.setPosition(1);
-            if(elevatorPhotogate.getValue()>=500){
+            LiftServo.setPosition(.7);
+            if(elevatorPhotogate.getValue()>=24){
                 ElevatorStop();
-            }else{LiftServo.setPosition(1);}
-        }else { LiftServo.setPosition(1);}
+            }
+        }
     }
 
    public void flipClimbers(){
@@ -159,8 +159,6 @@ public class FellowshipTele extends OpMode {
                     HopperLower();
 
 
-            } else {
-                ElevatorStop();
             }
 
 
@@ -216,7 +214,7 @@ public class FellowshipTele extends OpMode {
 
 
         //telemetry section
-
+telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
 
     }
     @Override
