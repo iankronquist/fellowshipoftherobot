@@ -23,6 +23,7 @@ public class FellowshipTele extends OpMode {
     AnalogInput elevatorPhotogate;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 35;
+    final float minAngle = 28;
     final double triggerCutoff = .2;
     final double power = .9;
     final double searchingPower = 0.1;
@@ -79,7 +80,14 @@ public class FellowshipTele extends OpMode {
         }
         }
 
+    public void OpenDoors(){
+    HopperDoor.setPosition(.9);
+    }
 
+    public void Brake(){
+        RightZipline.setPosition(.8);
+        RightZipline.setPosition(.8);
+    }
 
 
 
@@ -100,7 +108,7 @@ public class FellowshipTele extends OpMode {
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
-        DebrisMotor.setPower(.05);
+        DebrisMotor.setPower(.015);
         LeftZipline = hardwareMap.servo.get("LeftZipline");
         RightZipline = hardwareMap.servo.get("RightZipline");
         RightZipline.setDirection(Servo.Direction.REVERSE);
@@ -112,8 +120,11 @@ public class FellowshipTele extends OpMode {
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
         HopperDoor = hardwareMap.servo.get("HopperDoor");
-        //HopperDoor.setPosition(.5);
-        ClimberServo.setPosition(.5);
+        HopperDoor.setPosition(.5);
+        LeftZipline.setPosition(.5);
+        RightZipline.setPosition(.5);
+        ClimberServo.setPosition(0);
+        LiftServo.setPosition(.5);
     }
 
     @Override
@@ -198,7 +209,8 @@ public class FellowshipTele extends OpMode {
             //scaling position to have the max value as the max angle
             int TargetEncoderValue = (int) (position * EncoderMax);
             //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            DebrisMotor.setTargetPosition(TargetEncoderValue);
+            if (gamepad1.right_stick_x>.1||gamepad1.right_stick_x<-.1){DebrisMotor.setTargetPosition(TargetEncoderValue);}
+            if(gamepad1.right_stick_x<=.1&&gamepad1.right_stick_x>=-.1){DebrisMotor.setTargetPosition(0);}
 
 
             //Roller Code
@@ -213,13 +225,24 @@ public class FellowshipTele extends OpMode {
 
 
         //Climber code
-        if(!climbersFlipped&&gamepad1.left_bumper)
+        if(gamepad1.right_bumper)
         {
             flipClimbers();
-            climbersFlipped = true;
+        }else{
+            ClimberServo.setPosition(0);
         }
 
+//Hopper Door code
+        if( (Math.abs(DebrisMotor.getCurrentPosition())*360/EncoderPerRotation)>=minAngle){
+            OpenDoors();
+        }else{
+            HopperDoor.setPosition(.5);
+        }
 
+        //Braking code
+        if(gamepad1.y){
+            Brake();
+        }
 
 
 
