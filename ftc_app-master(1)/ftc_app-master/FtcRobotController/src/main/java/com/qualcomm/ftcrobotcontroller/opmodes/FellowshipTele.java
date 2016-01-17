@@ -18,6 +18,7 @@ public class FellowshipTele extends OpMode {
     Servo RightZipline;
     Servo LiftServo;
     Servo ClimberServo;
+    Servo HopperDoor;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     final float EncoderPerRotation = 1680;
@@ -28,7 +29,7 @@ public class FellowshipTele extends OpMode {
     float smallPower = (1/5);
     boolean RightDown = false;
     boolean LeftDown = false;
-    //boolean climbersFlipped=false;
+    boolean climbersFlipped=false;
 
     public void RollerStop() {
         if(rollerPhotogate.getValue() >= 500)//photogate blocked?
@@ -47,33 +48,36 @@ public class FellowshipTele extends OpMode {
     }
     public void HopperRaise() {
         LiftServo.setPosition(.3);
-     if(elevatorPhotogate.getValue()<26){
-         ElevatorStop();
-         LiftServo.setPosition(.3);
-         if(elevatorPhotogate.getValue()>=24){
-             ElevatorStop();
-         }
-     }
+        if(elevatorPhotogate.getValue()<=30){
+            LookForClip();
+        }else{
+            LiftServo.setPosition(.3);
+            HopperRaise();
+        }
     }
+
     public void HopperLower() {
         LiftServo.setPosition(.7);
-        if(elevatorPhotogate.getValue()<26){
-            ElevatorStop();
+        if(elevatorPhotogate.getValue()<=30){
+            LookForClip();
+        }else{
             LiftServo.setPosition(.7);
-            if(elevatorPhotogate.getValue()>=24){
-                ElevatorStop();
-            }
+            HopperLower();
         }
     }
 
-   public void flipClimbers(){
+
+
+    public void flipClimbers(){
         ClimberServo.setPosition(1);
-        for(int i =0; i<25; i++){
-            i+=.5;
-        }
-        ClimberServo.setPosition(.5);
     }
 
+
+        public void LookForClip(){
+        if(elevatorPhotogate.getValue()>=100) {
+            ElevatorStop();
+        }
+        }
 
 
 
@@ -90,6 +94,7 @@ public class FellowshipTele extends OpMode {
         motorLeft = hardwareMap.dcMotor.get("motor_1");
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
         RollerMotor = hardwareMap.dcMotor.get("RollerMotor");
+        RollerMotor.setDirection(DcMotor.Direction.REVERSE);
         DebrisMotor = hardwareMap.dcMotor.get("DebrisMotor");
         DebrisMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         //may need a wait
@@ -100,12 +105,15 @@ public class FellowshipTele extends OpMode {
         RightZipline = hardwareMap.servo.get("RightZipline");
         RightZipline.setDirection(Servo.Direction.REVERSE);
         LiftServo = hardwareMap.servo.get("LiftServo");
-        LeftZipline.setPosition(0.5);
-        RightZipline.setPosition(0.5);
+        //LeftZipline.setPosition(0.5);
+        //RightZipline.setPosition(0.5);
         ClimberServo = hardwareMap.servo.get("ClimberServo");
-        ClimberServo.setPosition(0.5);
+        //ClimberServo.setPosition(0.5);
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
+        HopperDoor = hardwareMap.servo.get("HopperDoor");
+        //HopperDoor.setPosition(.5);
+        ClimberServo.setPosition(.5);
     }
 
     @Override
@@ -142,14 +150,15 @@ public class FellowshipTele extends OpMode {
         //this is a continuous rotation servo
         //for a continuous rotation servo, 0 is spin one direction full power, 1 is the other direction full power
         //and 0.5 is stopped.
-        /* if(gamepad1.dpad_up){
+        if(gamepad1.dpad_up){
             LiftServo.setPosition(0);
         } else if(gamepad1.dpad_down){
         LiftServo.setPosition(1);
-        }else{
-        LiftServo.setPosition(0.5);
-         */
-            if (gamepad1.dpad_up) {
+        }else {
+            LiftServo.setPosition(0.5);
+        }
+
+            /*if (gamepad1.dpad_up) {
 
                     HopperRaise();
 
@@ -159,55 +168,56 @@ public class FellowshipTele extends OpMode {
                     HopperLower();
 
 
-            }
+            }*/
 
 
-        //zipline servo code
-        if (gamepad1.x)
-            if (!LeftDown) {
-                LeftZipline.setPosition(1);
-                LeftDown = true;
+            //zipline servo code
+            if (gamepad1.x)
+                if (!LeftDown) {
+                    LeftZipline.setPosition(1);
+                    LeftDown = true;
+                } else {
+                    LeftZipline.setPosition(0.5);
+                    LeftDown = false;
+                }
+            if (gamepad1.b)
+                if (!RightDown) {
+                    RightZipline.setPosition(1);
+                    RightDown = true;
+                } else {
+                    RightZipline.setPosition(.5);
+                    RightDown = false;
+                }
+
+
+            //Bucket Tilting code
+            //joystick reads from -1 to 1 on each axis
+            float position = gamepad1.right_stick_x;
+            //changing max angle allowed from degrees to encoder units
+            float EncoderMax = (maxAngle / 360) * EncoderPerRotation;
+            //scaling position to have the max value as the max angle
+            int TargetEncoderValue = (int) (position * EncoderMax);
+            //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+            DebrisMotor.setTargetPosition(TargetEncoderValue);
+
+
+            //Roller Code
+            //when trigger is pressed, power is set
+            if (gamepad1.right_trigger > triggerCutoff) {
+                RollerMotor.setPower(power);
+            } else if (gamepad1.left_trigger > triggerCutoff) {
+                RollerMotor.setPower(-power);
             } else {
-                LeftZipline.setPosition(0.5);
-                LeftDown = false;
-            }
-        if (gamepad1.b)
-            if (!RightDown) {
-                RightZipline.setPosition(1);
-                RightDown = true;
-            } else {
-                RightZipline.setPosition(.5);
-                RightDown = false;
+                RollerStop();
             }
 
-
-        //Bucket Tilting code
-        //joystick reads from -1 to 1 on each axis
-        float position = gamepad1.right_stick_x;
-        //changing max angle allowed from degrees to encoder units
-        float EncoderMax = (maxAngle / 360) * EncoderPerRotation;
-        //scaling position to have the max value as the max angle
-        int TargetEncoderValue = (int)(position * EncoderMax);
-        //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        DebrisMotor.setTargetPosition(TargetEncoderValue);
-
-
-        //Roller Code
-        //when trigger is pressed, power is set
-        if (gamepad1.right_trigger > triggerCutoff) {
-            RollerMotor.setPower(power);
-        } else if (gamepad1.left_trigger > triggerCutoff) {
-            RollerMotor.setPower(-power);
-        } else {
-            RollerStop();
-        }
 
         //Climber code
-        /*if(climbersFlipped&&gamepad1.left_bumper)
+        if(!climbersFlipped&&gamepad1.left_bumper)
         {
             flipClimbers();
             climbersFlipped = true;
-        }*/
+        }
 
 
 
@@ -215,6 +225,7 @@ public class FellowshipTele extends OpMode {
 
         //telemetry section
 telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
+        telemetry.addData("elevatorEncoder", DebrisMotor.getCurrentPosition());
 
     }
     @Override
