@@ -27,10 +27,10 @@ public class FellowshipTele extends OpMode {
     final double triggerCutoff = .2;
     final double power = .9;
     final double searchingPower = 0.1;
-    float smallPower = (1/5);
+    final double miniPower = 0.5;
     boolean RightDown = false;
     boolean LeftDown = false;
-    boolean climbersFlipped=false;
+    float smallPower = (float)miniPower;
 
     public void RollerStop() {
         if(rollerPhotogate.getValue() >= 500)//photogate blocked?
@@ -274,7 +274,7 @@ telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
             index = -index;
         }
 
-        // index cannot exceed size of array qqQSQQqsQSqsQSsminus 1.
+        // index cannot exceed size of array minus 1.
         if (index > 16) {
             index = 16;
         }
