@@ -53,6 +53,9 @@ public class FellowshipAuto extends LinearOpMode {
         RollerMotor.setDirection(DcMotor.Direction.REVERSE);
         DebrisMotor = hardwareMap.dcMotor.get("DebrisMotor");
         DebrisMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        motorLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        motorRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        DebrisMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
@@ -76,21 +79,21 @@ public class FellowshipAuto extends LinearOpMode {
     }
 
     public void forward() {
-        motorLeft.setPower(0.5);
         motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        motorLeft.setPower(0.5);
         motorLeft.setTargetPosition(200);
-        motorRight.setPower(0.5);
         motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        motorRight.setPower(0.5);
         motorRight.setPower(0.5);
     }
 
     public void turn() {
-        motorLeft.setPower(-0.1);
         motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        motorLeft.setPower(-0.1);
         motorLeft.setTargetPosition(10);
-        motorRight.setPower(0.1);
         motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorRight.setPower(10);
+        motorRight.setPower(0.1);
+        motorRight.setTargetPosition(10);
     }
 
 }
