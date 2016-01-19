@@ -23,6 +23,7 @@ public class FellowshipAuto extends LinearOpMode {
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     final float EncoderPerRotation = 1680;
+    final float EncoderPerRotation40 = 1120;
     final float maxAngle = 35;
     final float minAngle = 28;
     final double triggerCutoff = .2;
@@ -34,10 +35,10 @@ public class FellowshipAuto extends LinearOpMode {
     boolean Braked = false;
     float smallPower = (float)miniPower;
 
-    public void First
-
-
-    public FellowshipAuto() {
+    public FellowshipAuto()
+    {
+        forward();
+        turn();
 
     }
 
@@ -75,15 +76,28 @@ public class FellowshipAuto extends LinearOpMode {
 
     @Override
 
-motorLeft.setPower(asdf);
-motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorLeft.setTargetPosition(9q390q);
+        public void forward() {
+            motorLeft.setPower(0.5);
+            motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+            motorLeft.setTargetPosition(200);
+            motorRight.setPower(0.5);
+            motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+            motorRight.setPower(0.5);
+    }
+
+        public void turn(){
+            motorLeft.setPower(-0.1);
+            motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+            motorLeft.setTargetPosition(10);
+            motorRight.setPower(0.1);
+            motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+            motorRight.setPower(10);
+        }
 
         //telemetry section
         telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
         telemetry.addData("elevatorEncoder", DebrisMotor.getCurrentPosition());
 
-    FistRIt();
     @Override
     public void stop() {
 
