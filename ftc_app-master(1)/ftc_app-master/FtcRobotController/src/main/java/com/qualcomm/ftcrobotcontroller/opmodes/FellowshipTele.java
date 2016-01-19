@@ -193,6 +193,7 @@ public class FellowshipTele extends OpMode {
             if (!LeftDown) {
                 LeftZipline.setPosition(1);
                 LeftDown = true;
+
             } else {
                 LeftZipline.setPosition(0.5);
                 LeftDown = false;
@@ -202,7 +203,7 @@ public class FellowshipTele extends OpMode {
                 RightZipline.setPosition(1);
                 RightDown = true;
             } else {
-                RightZipline.setPosition(.5);
+                RightZipline.setPosition(0.5);
                 RightDown = false;
             }
 
