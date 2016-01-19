@@ -33,17 +33,18 @@ public class FellowshipAuto extends LinearOpMode {
     boolean RightDown = false;
     boolean LeftDown = false;
     boolean Braked = false;
-    float smallPower = (float)miniPower;
+    float smallPower = (float) miniPower;
 
-    public FellowshipAuto()
-    {
+    @Override
+    public void runOpMode() {
+        map();
         forward();
         turn();
 
     }
 
-    @Override
-    public void init() {
+
+    public void map() {
 
         motorRight = hardwareMap.dcMotor.get("motor_2");
         motorLeft = hardwareMap.dcMotor.get("motor_1");
@@ -74,32 +75,22 @@ public class FellowshipAuto extends LinearOpMode {
         LiftServo.setPosition(.5);
     }
 
-    @Override
-
-        public void forward() {
-            motorLeft.setPower(0.5);
-            motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            motorLeft.setTargetPosition(200);
-            motorRight.setPower(0.5);
-            motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            motorRight.setPower(0.5);
+    public void forward() {
+        motorLeft.setPower(0.5);
+        motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        motorLeft.setTargetPosition(200);
+        motorRight.setPower(0.5);
+        motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        motorRight.setPower(0.5);
     }
 
-        public void turn(){
-            motorLeft.setPower(-0.1);
-            motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            motorLeft.setTargetPosition(10);
-            motorRight.setPower(0.1);
-            motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-            motorRight.setPower(10);
-        }
-
-        //telemetry section
-        telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
-        telemetry.addData("elevatorEncoder", DebrisMotor.getCurrentPosition());
-
-    @Override
-    public void stop() {
-
+    public void turn() {
+        motorLeft.setPower(-0.1);
+        motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        motorLeft.setTargetPosition(10);
+        motorRight.setPower(0.1);
+        motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        motorRight.setPower(10);
     }
+
 }
