@@ -21,11 +21,11 @@ public class FellowshipTele extends OpMode {
     Servo HopperDoor;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
-    final float EncoderPerRotation = 1680;
+    final float EncoderPerRotation60 = 1680;
     final float maxAngle = 35;
     final float minAngle = 28;
     final double triggerCutoff = .2;
-    final double power = .9;
+    final double power = .3;
     final double searchingPower = 0.1;
     final double miniPower = 0.5;
     boolean RightDown = false;
@@ -84,7 +84,7 @@ public class FellowshipTele extends OpMode {
     public void OpenDoors(){
     HopperDoor.setPosition(.9);
     }
-
+//Braking cosde
     public void Brake(){
         RightZipline.setPosition(.2);
         LeftZipline.setPosition(.2);
@@ -167,9 +167,9 @@ public class FellowshipTele extends OpMode {
         //this is a continuous rotation servo
         //for a continuous rotation servo, 0 is spin one direction full power, 1 is the other direction full power
         //and 0.5 is stopped.
-        if (gamepad1.dpad_up) {
+        if (gamepad2.dpad_up) {
             LiftServo.setPosition(0);
-        } else if (gamepad1.dpad_down) {
+        } else if (gamepad2.dpad_down) {
             LiftServo.setPosition(1);
         } else {
             LiftServo.setPosition(0.5);
@@ -189,37 +189,29 @@ public class FellowshipTele extends OpMode {
 
 
         //zipline servo code
-        if (gamepad1.x)
-            if (!LeftDown) {
-                LeftZipline.setPosition(1);
-                LeftDown = true;
-
-            } else {
-                LeftZipline.setPosition(0.5);
-                LeftDown = false;
-            }
-        if (gamepad1.b)
-            if (!RightDown) {
-                RightZipline.setPosition(1);
-                RightDown = true;
-            } else {
-                RightZipline.setPosition(0.5);
-                RightDown = false;
-            }
-
+        if(gamepad2.left_stick_x>0){
+            RightZipline.setPosition((gamepad2.left_stick_x/2)+.5);
+        }
+        if(gamepad2.left_stick_x<0){
+            LeftZipline.setPosition((-gamepad2.left_stick_x/2)+.5);
+        }
+        if(gamepad2.left_stick_x==0){
+            LeftZipline.setPosition(.5);
+            RightZipline.setPosition(.5);
+        }
 
         //Bucket Tilting code
         //joystick reads from -1 to 1 on each axis
-        float position = gamepad1.right_stick_x;
+        float position = gamepad2.right_stick_x;
         //changing max angle allowed from degrees to encoder units
-        float EncoderMax = (maxAngle / 360) * EncoderPerRotation;
+        float EncoderMax = (maxAngle / 360) * EncoderPerRotation60;
         //scaling position to have the max value as the max angle
         int TargetEncoderValue = (int) (position * EncoderMax);
         //DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        if (gamepad1.right_stick_x > .1 || gamepad1.right_stick_x < -.1) {
+        if (gamepad2.right_stick_x > .1 || gamepad2.right_stick_x < -.1) {
             DebrisMotor.setTargetPosition(TargetEncoderValue);
         }
-        if (gamepad1.right_stick_x <= .1 && gamepad1.right_stick_x >= -.1) {
+        if (gamepad2.right_stick_x <= .1 && gamepad2.right_stick_x >= -.1) {
             DebrisMotor.setTargetPosition(0);
         }
 
@@ -239,28 +231,28 @@ public class FellowshipTele extends OpMode {
         if (gamepad1.right_bumper) {
             flipClimbers();
         } else {
-            ClimberServo.setPosition(0);
+            ClimberServo.setPosition(.3);
         }
 
 //Hopper Door code
-        if ((Math.abs(DebrisMotor.getCurrentPosition()) * 360 / EncoderPerRotation) >= minAngle) {
+        if ((Math.abs(DebrisMotor.getCurrentPosition()) * 360 / EncoderPerRotation60) >= minAngle) {
             OpenDoors();
         } else {
             HopperDoor.setPosition(.5);
         }
 
         //Braking code
-        if (gamepad1.y && !Braked) {
+        if (gamepad1.y) {
             Brake();
-            Braked = true;
-        } else if (gamepad1.y && Braked){
+
+        } else{
             UnBrake();
     }
 
 
 
         //telemetry section
-telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
+        telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
         telemetry.addData("elevatorEncoder", DebrisMotor.getCurrentPosition());
 
     }
