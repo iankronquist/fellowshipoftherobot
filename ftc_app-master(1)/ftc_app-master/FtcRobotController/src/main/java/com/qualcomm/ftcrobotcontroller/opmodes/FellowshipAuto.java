@@ -34,7 +34,6 @@ public class FellowshipAuto extends LinearOpMode {
     boolean Braked = false;
     float smallPower = (float)miniPower;
 
-    public void First
 
 
     public FellowshipAuto() {
@@ -42,50 +41,11 @@ public class FellowshipAuto extends LinearOpMode {
     }
 
     @Override
-    public void init() {
+    public void runOpMode(){
 
-        motorRight = hardwareMap.dcMotor.get("motor_2");
-        motorLeft = hardwareMap.dcMotor.get("motor_1");
-        motorLeft.setDirection(DcMotor.Direction.REVERSE);
-        RollerMotor = hardwareMap.dcMotor.get("RollerMotor");
-        RollerMotor.setDirection(DcMotor.Direction.REVERSE);
-        DebrisMotor = hardwareMap.dcMotor.get("DebrisMotor");
-        DebrisMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        //may need a wait
-        DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        DebrisMotor.setTargetPosition(0);
-        DebrisMotor.setPower(.015);
-        LeftZipline = hardwareMap.servo.get("LeftZipline");
-        RightZipline = hardwareMap.servo.get("RightZipline");
-        RightZipline.setDirection(Servo.Direction.REVERSE);
-        LiftServo = hardwareMap.servo.get("LiftServo");
-        //LeftZipline.setPosition(0.5);
-        //RightZipline.setPosition(0.5);
-        ClimberServo = hardwareMap.servo.get("ClimberServo");
-        //ClimberServo.setPosition(0.5);
-        rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
-        elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
-        HopperDoor = hardwareMap.servo.get("HopperDoor");
-        HopperDoor.setPosition(.5);
-        LeftZipline.setPosition(.5);
-        RightZipline.setPosition(.5);
-        ClimberServo.setPosition(0);
-        LiftServo.setPosition(.5);
-    }
 
-    @Override
 
-motorLeft.setPower(asdf);
-motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorLeft.setTargetPosition(9q390q);
-
-        //telemetry section
-        telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
-        telemetry.addData("elevatorEncoder", DebrisMotor.getCurrentPosition());
-
-    FistRIt();
-    @Override
-    public void stop() {
 
     }
+
 }
