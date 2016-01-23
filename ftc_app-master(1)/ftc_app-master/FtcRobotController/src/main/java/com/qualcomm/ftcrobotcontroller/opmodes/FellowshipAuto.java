@@ -81,11 +81,11 @@ public class FellowshipAuto extends LinearOpMode {
 
     public void forward() {
         motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorLeft.setPower(0.25);
-        motorLeft.setTargetPosition(100);
+        motorLeft.setPower(0.22);
+        motorLeft.setTargetPosition(55);
         motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorRight.setPower(0.25);
-        motorRight.setTargetPosition(100);
+        motorRight.setPower(0.22);
+        motorRight.setTargetPosition(55);
     }
 
     public void turn() {
