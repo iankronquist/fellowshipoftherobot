@@ -17,9 +17,9 @@ public class FellowshipAuto extends LinearOpMode {
     DcMotor RollerMotor;
     Servo LeftZipline;
     Servo RightZipline;
-    Servo LiftServo;
     Servo ClimberServo;
     Servo HopperDoor;
+    Servo LiftServo;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     final float EncoderPerRotation = 1680;
@@ -41,7 +41,7 @@ public class FellowshipAuto extends LinearOpMode {
     public void runOpMode() {
         map();
         forward();
-        turn();
+        //turn();
     }
 
 
@@ -53,39 +53,42 @@ public class FellowshipAuto extends LinearOpMode {
         RollerMotor = hardwareMap.dcMotor.get("RollerMotor");
         RollerMotor.setDirection(DcMotor.Direction.REVERSE);
         DebrisMotor = hardwareMap.dcMotor.get("DebrisMotor");
-        DebrisMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        LeftZipline = hardwareMap.servo.get("LeftZipline");
+        RightZipline = hardwareMap.servo.get("RightZipline");
+        RightZipline.setDirection(Servo.Direction.REVERSE);
         motorLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         motorRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
+        motorLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        motorRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         DebrisMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
         DebrisMotor.setPower(.015);
-        LeftZipline = hardwareMap.servo.get("LeftZipline");
-        RightZipline = hardwareMap.servo.get("RightZipline");
-        RightZipline.setDirection(Servo.Direction.REVERSE);
         LiftServo = hardwareMap.servo.get("LiftServo");
-        //LeftZipline.setPosition(0.5);
-        //RightZipline.setPosition(0.5);
+        LiftServo.setPosition(.5);
         ClimberServo = hardwareMap.servo.get("ClimberServo");
+        HopperDoor = hardwareMap.servo.get("HopperDoor");
+        HopperDoor.setPosition(.5);
         //ClimberServo.setPosition(0.5);
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
-        HopperDoor = hardwareMap.servo.get("HopperDoor");
-        HopperDoor.setPosition(.5);
+        ClimberServo.setPosition(0);
         LeftZipline.setPosition(.5);
         RightZipline.setPosition(.5);
-        ClimberServo.setPosition(0);
-        LiftServo.setPosition(.5);
     }
 
     public void forward() {
-        motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorLeft.setPower(0.22);
-        motorLeft.setTargetPosition(55);
-        motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorRight.setPower(0.22);
-        motorRight.setTargetPosition(55);
+        while(motorLeft.getCurrentPosition()<100){
+        motorLeft.setPower(1);}
+        while(motorRight.getCurrentPosition()<100){
+            motorRight.setPower(1);
+        }
+        motorLeft.setPower(0);
+        motorRight.setPower(0);
+
+        telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
     }
 
     public void turn() {
