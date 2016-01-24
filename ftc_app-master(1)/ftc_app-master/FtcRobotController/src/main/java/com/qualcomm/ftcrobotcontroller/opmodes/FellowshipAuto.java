@@ -80,11 +80,10 @@ public class FellowshipAuto extends LinearOpMode {
     }
 
     public void forward() {
-        while(motorLeft.getCurrentPosition()<100){
-        motorLeft.setPower(1);}
-        while(motorRight.getCurrentPosition()<100){
-            motorRight.setPower(1);
-        }
+        while(motorLeft.getCurrentPosition()>-2000||motorRight.getCurrentPosition()>-2000){
+        motorLeft.setPower(1);
+        motorRight.setPower(1);}
+
         motorLeft.setPower(0);
         motorRight.setPower(0);
 
@@ -92,12 +91,10 @@ public class FellowshipAuto extends LinearOpMode {
     }
 
     public void turn() {
-        motorLeft.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorLeft.setPower(-0.1);
-        motorLeft.setTargetPosition(10);
-        motorRight.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorRight.setPower(0.1);
-        motorRight.setTargetPosition(10);
+       while(motorLeft.getCurrentPosition()>-2000||motorRight.getCurrentPosition()<2000){
+           motorLeft.setPower(1);
+           motorRight.setPower(-1);
+       }
     }
 
 }
