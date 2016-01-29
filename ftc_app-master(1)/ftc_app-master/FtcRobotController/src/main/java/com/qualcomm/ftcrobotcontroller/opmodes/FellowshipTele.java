@@ -28,9 +28,6 @@ public class FellowshipTele extends OpMode {
     final double power = .3;
     final double searchingPower = 0.1;
     final double miniPower = 0.25;
-    boolean RightDown = false;
-    boolean LeftDown = false;
-    boolean Braked = false;
     boolean SearchingUp = false;
     boolean SearchingDown = false;
     boolean OpenFound = false;
