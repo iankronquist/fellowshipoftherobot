@@ -1,6 +1,5 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
@@ -29,19 +28,88 @@ public class FellowshipAuto extends LinearOpMode {
     final double triggerCutoff = .2;
     final double power = .9;
     final double searchingPower = 0.1;
-    final double miniPower = 0.5;
-    boolean RightDown = false;
-    boolean LeftDown = false;
-    boolean Braked = false;
+    boolean OpenFound = false;
+    boolean done = false;
 
-    float smallPower = (float) miniPower;
+    public void forward(double ForwardPower, int Target) {
+        while(motorLeft.getCurrentPosition()>-Target||motorRight.getCurrentPosition()>-Target){
+            motorLeft.setPower(ForwardPower);
+            motorRight.setPower(ForwardPower);}
+        motorLeft.setPower(0);
+        motorRight.setPower(0);
+        telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
+    }
 
+    public void turnRight(double TurnPower, int Target) {
+        while(motorLeft.getCurrentPosition()>-Target||motorRight.getCurrentPosition()<Target){
+            motorLeft.setPower(TurnPower);
+            motorRight.setPower(-TurnPower);
+        }
+    }
+    public void turnLeft(double TurnPower, int Target) {
+        while(motorLeft.getCurrentPosition()<Target||motorRight.getCurrentPosition()>-Target){
+            motorLeft.setPower(-TurnPower);
+            motorRight.setPower(TurnPower);
+        }
+    }
+
+    public void RollerStop() {
+        if(rollerPhotogate.getValue() >= 500)//photogate blocked?
+        {
+            RollerMotor.setPower(0);//stop motor
+        } else {
+            RollerMotor.setPower(-searchingPower);
+        }
+    }
+
+
+    public void LookForClip(){
+        if(elevatorPhotogate.getValue()>=100) {
+            ElevatorStop();
+            done =true;
+        }
+    }
+    public void FindOpen(){
+        if(elevatorPhotogate.getValue() <= 30){
+            OpenFound = true;
+        }
+    }
+
+    public void RaiseHopper(){
+        while(!OpenFound&&!done){
+            LiftServo.setPosition(0);
+            FindOpen();
+        }
+        while(OpenFound&&!done){
+            LookForClip();
+        }
+    }
+
+
+    public void ElevatorStop() {
+        LiftServo.setPosition(.5);
+    }
+    public void resetEncoders(){
+        motorLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        motorRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        motorLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        motorRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
+    }
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
+
         map();
-        forward();
-        //turn();
+        waitForStart();
+        RollerStop();
+        RaiseHopper();
+        /*forward(1, 100);
+        resetEncoders();
+        turnRight(1, 100);
+        resetEncoders();
+        turnLeft(1, 100);
+        resetEncoders();*/
     }
 
 
@@ -79,22 +147,8 @@ public class FellowshipAuto extends LinearOpMode {
         RightZipline.setPosition(.5);
     }
 
-    public void forward() {
-        while(motorLeft.getCurrentPosition()>-2000||motorRight.getCurrentPosition()>-2000){
-        motorLeft.setPower(1);
-        motorRight.setPower(1);}
 
-        motorLeft.setPower(0);
-        motorRight.setPower(0);
 
-        telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
-    }
 
-    public void turn() {
-       while(motorLeft.getCurrentPosition()>-2000||motorRight.getCurrentPosition()<2000){
-           motorLeft.setPower(1);
-           motorRight.setPower(-1);
-       }
-    }
 
 }

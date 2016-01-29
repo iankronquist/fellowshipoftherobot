@@ -37,9 +37,6 @@ public class FellowshipTele extends OpMode {
         if(rollerPhotogate.getValue() >= 500)//photogate blocked?
         {
             RollerMotor.setPower(0);//stop motor
-        } else if(RollerMotor.getPower() > 0) //motor turning with positive power?
-        {
-            RollerMotor.setPower(searchingPower); //set to low power to find flag
         } else {
             RollerMotor.setPower(-searchingPower);
         }
