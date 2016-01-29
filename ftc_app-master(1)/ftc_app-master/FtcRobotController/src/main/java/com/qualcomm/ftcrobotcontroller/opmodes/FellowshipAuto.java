@@ -30,6 +30,7 @@ public class FellowshipAuto extends LinearOpMode {
     final double searchingPower = 0.1;
     boolean OpenFound = false;
     boolean done = false;
+    boolean found = false;
 
     public void forward(double ForwardPower, int Target) {
         while(motorLeft.getCurrentPosition()>-Target||motorRight.getCurrentPosition()>-Target){
@@ -54,12 +55,14 @@ public class FellowshipAuto extends LinearOpMode {
     }
 
     public void RollerStop() {
-        if(rollerPhotogate.getValue() >= 500)//photogate blocked?
-        {
-            RollerMotor.setPower(0);//stop motor
-        } else {
+        while(!found){
             RollerMotor.setPower(-searchingPower);
+            if(rollerPhotogate.getValue() >= 500){
+                found = true;
+            }
         }
+        RollerMotor.setPower(0);
+
     }
 
 
@@ -104,6 +107,9 @@ public class FellowshipAuto extends LinearOpMode {
         waitForStart();
         RollerStop();
         RaiseHopper();
+        RaiseHopper();
+        forward(1, 100);
+        //turnLeft(1, 100);
         /*forward(1, 100);
         resetEncoders();
         turnRight(1, 100);
