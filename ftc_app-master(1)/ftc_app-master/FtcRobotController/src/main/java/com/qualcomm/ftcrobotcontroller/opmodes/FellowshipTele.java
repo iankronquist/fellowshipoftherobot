@@ -27,10 +27,11 @@ public class FellowshipTele extends OpMode {
     final double triggerCutoff = .2;
     final double power = .3;
     final double searchingPower = 0.1;
-    final double miniPower = 0.25;
+    final double miniPower = 0.35;
     boolean SearchingUp = false;
     boolean SearchingDown = false;
     boolean OpenFound = false;
+    boolean climbersFlipped = false;
     float smallPower = (float)miniPower;
 
     public void RollerStop() {
@@ -38,7 +39,7 @@ public class FellowshipTele extends OpMode {
         {
             RollerMotor.setPower(0);//stop motor
         } else {
-            RollerMotor.setPower(-searchingPower);
+            RollerMotor.setPower(searchingPower);
         }
     }
 
@@ -199,8 +200,11 @@ public class FellowshipTele extends OpMode {
         //Climber code
         if (gamepad1.right_bumper) {
             flipClimbers();
-        } else {
-            ClimberServo.setPosition(.3);
+            climbersFlipped = true;
+        } else if(climbersFlipped) {
+            ClimberServo.setPosition(0.5);
+        }else {
+            ClimberServo.setPosition(0);
         }
 
 //Hopper Door code
@@ -244,7 +248,9 @@ if(SearchingUp&&!OpenFound){
             LiftServo.setPosition(1);
             LookForClip();
         }
-
+if(SearchingDown&&SearchingUp){
+    SearchingDown = false;
+}
 
         //telemetry section
         telemetry.addData("elevatorGate", elevatorPhotogate.getValue());

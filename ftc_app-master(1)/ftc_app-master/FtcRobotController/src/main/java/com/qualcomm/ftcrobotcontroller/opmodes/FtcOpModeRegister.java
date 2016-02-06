@@ -63,7 +63,10 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("PushBotAuto", PushBotAuto.class);
     manager.register ("PushBotManual", PushBotManual.class);
     manager.register ("FellowshipTele", FellowshipTele.class);
-    manager.register("FellowshipAuto", FellowshipAuto.class);
+    manager.register("FellowshipRedAuto", FellowshipRedAuto.class);
+    manager.register("FellowshipBlueAuto", FellowshipBlueAuto.class);
+    manager.register("MemeOp", MemeOp.class);
+
 
 
 
