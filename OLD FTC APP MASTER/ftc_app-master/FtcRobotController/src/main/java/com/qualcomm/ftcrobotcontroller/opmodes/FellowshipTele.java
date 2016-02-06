@@ -19,6 +19,8 @@ public class FellowshipTele extends OpMode {
     Servo LiftServo;
     Servo ClimberServo;
     Servo HopperDoor;
+    Servo LeftTail;
+    Servo RightTail;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     final float EncoderPerRotation60 = 1680;
@@ -116,6 +118,8 @@ public class FellowshipTele extends OpMode {
         RightZipline.setPosition(.5);
         ClimberServo.setPosition(0);
         LiftServo.setPosition(.5);
+        LeftTail.setPosition(0.5);
+        RightTail.setPosition(0.5);
     }
 
     @Override
@@ -167,6 +171,16 @@ public class FellowshipTele extends OpMode {
                     SearchingDown = true;
             }
 
+        if (gamepad1.dpad_down)
+         {
+             LeftTail.setPosition(0.75);
+             RightTail.setPosition(0.75);
+         }
+        else
+         {
+             LeftTail.setPosition(0.5);
+             RightTail.setPosition(0.5);
+         }
 
 
 
