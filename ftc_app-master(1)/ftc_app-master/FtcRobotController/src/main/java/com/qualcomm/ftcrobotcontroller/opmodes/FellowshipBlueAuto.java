@@ -24,7 +24,7 @@ public class FellowshipBlueAuto extends LinearOpMode {
     final float EncoderPerRotation40 = 1120;
     final double power = .9;
     final double searchingPower = 0.1;
-    final double movePower = 0.5;
+    final double movePower = 0.01;
     boolean OpenFound = false;
     boolean OpenFound2  = false;
     boolean OpenFound3 = false;
