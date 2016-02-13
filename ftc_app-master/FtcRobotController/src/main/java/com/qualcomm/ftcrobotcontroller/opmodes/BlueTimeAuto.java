@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 
-public class RedTimeAuto extends LinearOpMode {
+public class BlueTimeAuto extends LinearOpMode {
 
     DcMotor motorRight;
     DcMotor motorLeft;
@@ -23,7 +23,7 @@ public class RedTimeAuto extends LinearOpMode {
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     final double turnPower = 0.01;
-    final double arcOffset = .9;
+    final double arcOffset = .85;
     final double movePower = .25;
     final double rollerPower = -.9;
     public void stopMotors() throws InterruptedException{
@@ -37,7 +37,7 @@ public class RedTimeAuto extends LinearOpMode {
         map();
         waitForStart();
         waitForNextHardwareCycle();
-       // RollerStop();
+        // RollerStop();
         //RaiseHopper();
         RollerMotor.setPower(rollerPower);
         //forward(movePower, 2000);
@@ -53,10 +53,9 @@ public class RedTimeAuto extends LinearOpMode {
         //AutoFlip();
         //waitOneFullHardwareCycle();
         waitOneFullHardwareCycle();
-        motorLeft.setPower(turnPower +arcOffset);
-        motorRight.setPower(turnPower);
+        motorLeft.setPower(turnPower);
+        motorRight.setPower(turnPower +arcOffset);
         Thread.sleep(2000);
-        waitOneFullHardwareCycle();
         stopMotors();
         motorLeft.setPower(movePower);
         motorRight.setPower(movePower);
@@ -95,7 +94,6 @@ public class RedTimeAuto extends LinearOpMode {
         RightTail=hardwareMap.servo.get("RightTail");
         LeftTail =hardwareMap.servo.get("LeftTail");
         LeftTail.setDirection(Servo.Direction.REVERSE);
-        waitOneFullHardwareCycle();
         ClimberServo.setPosition(0);
         LeftZipline.setPosition(.5);
         RightZipline.setPosition(.5);

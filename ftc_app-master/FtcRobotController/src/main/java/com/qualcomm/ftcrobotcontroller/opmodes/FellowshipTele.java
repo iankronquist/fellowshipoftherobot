@@ -14,11 +14,17 @@ public class FellowshipTele extends OpMode {
     DcMotor motorLeft;
     DcMotor DebrisMotor;
     DcMotor RollerMotor;
+    DcMotor RightHangMotor;
+    DcMotor LeftHangMotor;
     Servo LeftZipline;
     Servo RightZipline;
     Servo LiftServo;
     Servo ClimberServo;
     Servo HopperDoor;
+    Servo LeftTail;
+    Servo RightTail;
+    Servo RightHangServo;
+    Servo LeftHangServo;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     final float EncoderPerRotation60 = 1680;
@@ -27,12 +33,22 @@ public class FellowshipTele extends OpMode {
     final double triggerCutoff = .2;
     final double power = .3;
     final double searchingPower = 0.1;
-    final double miniPower = 0.35;
+    final double miniPower = 0.69;
     boolean SearchingUp = false;
     boolean SearchingDown = false;
     boolean OpenFound = false;
     boolean climbersFlipped = false;
+    boolean mountainMode = false;
+    int hangerPosition = 0;
     float smallPower = (float)miniPower;
+    final double zero = .53;
+    final double mid = .55;
+    final double high = .62;
+    final double offset = .01;
+    double desiredPosition;
+
+
+
 
     public void RollerStop() {
         if(rollerPhotogate.getValue() >= 500)//photogate blocked?
@@ -99,31 +115,41 @@ public class FellowshipTele extends OpMode {
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
-        DebrisMotor.setPower(.035);
+        DebrisMotor.setPower(0);
+        LeftHangMotor = hardwareMap.dcMotor.get("LeftHangMotor");
+        RightHangMotor = hardwareMap.dcMotor.get("RightHangMotor");
         LeftZipline = hardwareMap.servo.get("LeftZipline");
         RightZipline = hardwareMap.servo.get("RightZipline");
         RightZipline.setDirection(Servo.Direction.REVERSE);
         LiftServo = hardwareMap.servo.get("LiftServo");
-        //LeftZipline.setPosition(0.5);
-        //RightZipline.setPosition(0.5);
         ClimberServo = hardwareMap.servo.get("ClimberServo");
-        //ClimberServo.setPosition(0.5);
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
+        RightTail=hardwareMap.servo.get("RightTail");
+        LeftTail =hardwareMap.servo.get("LeftTail");
+        LeftTail.setDirection(Servo.Direction.REVERSE);
+        RightHangServo=hardwareMap.servo.get("RightHangServo");
+        LeftHangServo =hardwareMap.servo.get("LeftHangServo");
+        LeftHangServo.setDirection(Servo.Direction.REVERSE);
         HopperDoor = hardwareMap.servo.get("HopperDoor");
         HopperDoor.setPosition(.5);
         LeftZipline.setPosition(.5);
         RightZipline.setPosition(.5);
         ClimberServo.setPosition(0);
         LiftServo.setPosition(.5);
+        LeftTail.setPosition(.5);
+        RightTail.setPosition(.5);
+        RightHangServo.setPosition(zero);
+        LeftHangServo.setPosition(zero);
     }
 
     @Override
     public void loop() {
-
+        DebrisMotor.setPower(.035);
+        boolean ready = (RightHangServo.getPosition() == desiredPosition||LeftHangServo.getPosition()==desiredPosition);
         //drive code
         //may need change, this is from FTC
-        if (gamepad1.left_stick_button) {
+        if (gamepad1.left_stick_button||mountainMode) {
             float throttle = -gamepad1.left_stick_y;
             float direction = gamepad1.left_stick_x;
             float right = throttle - direction;
@@ -251,6 +277,51 @@ if(SearchingUp&&!OpenFound){
 if(SearchingDown&&SearchingUp){
     SearchingDown = false;
 }
+
+
+        //tails
+        if(gamepad1.a){
+            mountainMode = true;
+        }
+        if(gamepad1.x){
+            mountainMode = false;
+        }
+if(mountainMode) {
+    RightTail.setPosition(1);
+    LeftTail.setPosition(1);
+} else{
+    RightTail.setPosition(.5);
+    LeftTail.setPosition(.5);
+}
+        //hangers
+        if(gamepad1.dpad_up&&hangerPosition !=2){
+            hangerPosition++;
+        }
+        if(gamepad1.dpad_down&&hangerPosition !=0){
+            hangerPosition--;
+        }
+        if(hangerPosition == 0){
+            desiredPosition = zero;
+        }
+        if(hangerPosition == 1){
+            desiredPosition = mid;
+        }
+        if(hangerPosition == 2){
+            desiredPosition = high;
+        }
+        RightHangServo.setPosition(desiredPosition);
+        LeftHangServo.setPosition(desiredPosition+offset);
+
+        if(gamepad1.right_trigger>triggerCutoff){
+            LeftHangMotor.setPower(.8);
+            RightHangMotor.setPower(.8);
+        }else if(gamepad1.left_trigger>triggerCutoff) {
+            LeftHangMotor.setPower(-.8);
+            RightHangMotor.setPower(-.8);
+        }else{
+            LeftHangMotor.setPower(0);
+            RightHangMotor.setPower(0);
+        }
 
         //telemetry section
         telemetry.addData("elevatorGate", elevatorPhotogate.getValue());

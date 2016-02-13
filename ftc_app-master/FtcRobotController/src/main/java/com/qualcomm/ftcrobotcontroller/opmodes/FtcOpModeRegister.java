@@ -66,6 +66,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register ("RedAuto", FellowshipRedAuto.class);
     manager.register ("FellowshipTele", FellowshipTele.class);
     manager.register ("RedTimeAuto", RedTimeAuto.class);
+    manager.register ("BlueTimeAuto", BlueTimeAuto.class);
 
 
     /*
