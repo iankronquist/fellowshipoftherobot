@@ -23,7 +23,7 @@ public class BlueTimeAuto extends LinearOpMode {
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     final double turnPower = 0.01;
-    final double arcOffset = .85;
+    final double arcOffset = .9;
     final double movePower = .25;
     final double rollerPower = -.9;
     public void stopMotors() throws InterruptedException{
@@ -56,6 +56,7 @@ public class BlueTimeAuto extends LinearOpMode {
         motorLeft.setPower(turnPower);
         motorRight.setPower(turnPower +arcOffset);
         Thread.sleep(2000);
+        waitOneFullHardwareCycle();
         stopMotors();
         motorLeft.setPower(movePower);
         motorRight.setPower(movePower);
@@ -94,6 +95,7 @@ public class BlueTimeAuto extends LinearOpMode {
         RightTail=hardwareMap.servo.get("RightTail");
         LeftTail =hardwareMap.servo.get("LeftTail");
         LeftTail.setDirection(Servo.Direction.REVERSE);
+        waitOneFullHardwareCycle();
         ClimberServo.setPosition(0);
         LeftZipline.setPosition(.5);
         RightZipline.setPosition(.5);
