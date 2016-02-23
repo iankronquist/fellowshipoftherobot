@@ -20,12 +20,15 @@ public class RedTimeAuto extends LinearOpMode {
     Servo LiftServo;
     Servo RightTail;
     Servo LeftTail;
+    Servo RightHangServo;
+    Servo LeftHangServo;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
-    final double turnPower = 0.01;
+    final double turnPower = 0;
     final double arcOffset = .9;
-    final double movePower = .25;
+    final double movePower = .35;
     final double rollerPower = -.9;
+    final double zero = .53;
     public void stopMotors() throws InterruptedException{
         motorLeft.setPower(0);
         motorRight.setPower(0);
@@ -51,16 +54,19 @@ public class RedTimeAuto extends LinearOpMode {
         //LastForward();
         //waitOneFullHardwareCycle();
         //AutoFlip();
-        //waitOneFullHardwareCycle();
         waitOneFullHardwareCycle();
-        motorLeft.setPower(turnPower +arcOffset);
+        motorLeft.setPower(movePower);
+        motorRight.setPower(movePower);
+        Thread.sleep(400);
+        waitOneFullHardwareCycle();
+        motorLeft.setPower(turnPower + arcOffset);
         motorRight.setPower(turnPower);
-        Thread.sleep(2000);
+        Thread.sleep(1230);
         waitOneFullHardwareCycle();
         stopMotors();
         motorLeft.setPower(movePower);
         motorRight.setPower(movePower);
-        Thread.sleep(10000);
+        Thread.sleep(6000);
         stopMotors();
     }
 
@@ -90,6 +96,9 @@ public class RedTimeAuto extends LinearOpMode {
         HopperDoor = hardwareMap.servo.get("HopperDoor");
         HopperDoor.setPosition(.5);
         //ClimberServo.setPosition(0.5);
+        RightHangServo = hardwareMap.servo.get("RightHangServo");
+        LeftHangServo  = hardwareMap.servo.get("LeftHangServo");
+        LeftHangServo.setDirection(Servo.Direction.REVERSE);
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
         RightTail=hardwareMap.servo.get("RightTail");
@@ -99,8 +108,12 @@ public class RedTimeAuto extends LinearOpMode {
         ClimberServo.setPosition(0);
         LeftZipline.setPosition(.5);
         RightZipline.setPosition(.5);
-        RightTail.setPosition(.1);
-        LeftTail.setPosition(.1);
+        waitOneFullHardwareCycle();
+        RightTail.setPosition(0);
+        LeftTail.setPosition(0);
+        waitOneFullHardwareCycle();
+        RightHangServo.setPosition(zero+.01);
+        LeftHangServo.setPosition(zero+.035);
         waitOneFullHardwareCycle();
     }
 

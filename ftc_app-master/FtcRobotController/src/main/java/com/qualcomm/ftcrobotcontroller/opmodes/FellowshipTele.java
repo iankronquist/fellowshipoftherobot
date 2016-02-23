@@ -33,18 +33,19 @@ public class FellowshipTele extends OpMode {
     final double triggerCutoff = .2;
     final double power = .3;
     final double searchingPower = 0.1;
-    final double miniPower = 0.69;
+    final double miniPower = 0.8;
     boolean SearchingUp = false;
     boolean SearchingDown = false;
     boolean OpenFound = false;
     boolean climbersFlipped = false;
     boolean mountainMode = false;
+    boolean hanging = false;
     int hangerPosition = 0;
     float smallPower = (float)miniPower;
-    final double zero = .53;
-    final double mid = .55;
-    final double high = .62;
-    final double offset = .01;
+    final double zero = .60;
+    final double mid = .64;
+    final double high = .66;
+    final double offset = 0.035;
     double desiredPosition;
 
 
@@ -118,6 +119,7 @@ public class FellowshipTele extends OpMode {
         DebrisMotor.setPower(0);
         LeftHangMotor = hardwareMap.dcMotor.get("LeftHangMotor");
         RightHangMotor = hardwareMap.dcMotor.get("RightHangMotor");
+        LeftHangMotor.setDirection(DcMotor.Direction.REVERSE);
         LeftZipline = hardwareMap.servo.get("LeftZipline");
         RightZipline = hardwareMap.servo.get("RightZipline");
         RightZipline.setDirection(Servo.Direction.REVERSE);
@@ -137,10 +139,10 @@ public class FellowshipTele extends OpMode {
         RightZipline.setPosition(.5);
         ClimberServo.setPosition(0);
         LiftServo.setPosition(.5);
-        LeftTail.setPosition(.5);
-        RightTail.setPosition(.5);
-        RightHangServo.setPosition(zero);
-        LeftHangServo.setPosition(zero);
+        LeftTail.setPosition(.15);
+        RightTail.setPosition(.15);
+        RightHangServo.setPosition(zero+.01);
+        LeftHangServo.setPosition(zero+offset);
     }
 
     @Override
@@ -228,11 +230,14 @@ public class FellowshipTele extends OpMode {
             flipClimbers();
             climbersFlipped = true;
         } else if(climbersFlipped) {
-            ClimberServo.setPosition(0.5);
+            ClimberServo.setPosition(0.3);
         }else {
             ClimberServo.setPosition(0);
         }
-
+if(gamepad2.left_bumper){
+    RightHangServo.close();
+    LeftHangServo.close();
+}
 //Hopper Door code
         if ((Math.abs(DebrisMotor.getCurrentPosition()) * 360 / EncoderPerRotation60) >= minAngle) {
             OpenDoors();
@@ -290,8 +295,8 @@ if(mountainMode) {
     RightTail.setPosition(1);
     LeftTail.setPosition(1);
 } else{
-    RightTail.setPosition(.5);
-    LeftTail.setPosition(.5);
+    RightTail.setPosition(.15);
+    LeftTail.setPosition(.15);
 }
         //hangers
         if(gamepad1.dpad_up&&hangerPosition !=2){
@@ -309,18 +314,28 @@ if(mountainMode) {
         if(hangerPosition == 2){
             desiredPosition = high;
         }
-        RightHangServo.setPosition(desiredPosition);
+        RightHangServo.setPosition(desiredPosition+.01);
         LeftHangServo.setPosition(desiredPosition+offset);
 
         if(gamepad1.right_trigger>triggerCutoff){
             LeftHangMotor.setPower(.8);
             RightHangMotor.setPower(.8);
+
         }else if(gamepad1.left_trigger>triggerCutoff) {
             LeftHangMotor.setPower(-.8);
             RightHangMotor.setPower(-.8);
         }else{
             LeftHangMotor.setPower(0);
             RightHangMotor.setPower(0);
+        }
+        if(gamepad1.back){
+            hanging=true;
+        }
+
+
+        if(hanging){
+            LeftHangServo.setPosition(mid+offset);
+            RightHangServo.setPosition(mid+0.01);
         }
 
         //telemetry section
