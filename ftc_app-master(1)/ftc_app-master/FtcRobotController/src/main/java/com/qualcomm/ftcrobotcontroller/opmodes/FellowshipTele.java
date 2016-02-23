@@ -23,7 +23,7 @@ public class FellowshipTele extends OpMode {
     Servo RightZipline;
     Servo LiftServo;
     AnalogInput rollerPhotogate;
-    AnalogInput ElevatorPhotogate;
+    AnalogInput elevatorPhotogate;
     int HopperPosition = 0;
     final float EncoderPerRotation = 1680;
     final float maxAngle = 35;
@@ -48,14 +48,13 @@ public class FellowshipTele extends OpMode {
     }
 
     public void ElevatorStop() {
-        if (ElevatorPhotogate.getValue() > 100)
+        if (ElevatorPhotogate.getValue() > 0)
         {
             LiftServo.setPower(0);
         }
     }
 
-    public void HopperRaise()
-    {
+    public void HopperRaise(){
         LiftServo.setPosition(0);
     }
 
