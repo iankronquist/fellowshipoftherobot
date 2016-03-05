@@ -1,6 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.util.Range;
@@ -27,6 +28,7 @@ public class FellowshipTele extends OpMode {
     Servo LeftHangServo;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
+    ColorSensor floorSeeker;
     final float EncoderPerRotation60 = 1680;
     final float maxAngle = 35;
     final float minAngle = 32;
@@ -127,6 +129,10 @@ public class FellowshipTele extends OpMode {
         ClimberServo = hardwareMap.servo.get("ClimberServo");
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
+        floorSeeker = hardwareMap.colorSensor.get("floorSeeker");
+        floorSeeker.enableLed(false);
+        floorSeeker.enableLed(true);
+
         RightTail=hardwareMap.servo.get("RightTail");
         LeftTail =hardwareMap.servo.get("LeftTail");
         LeftTail.setDirection(Servo.Direction.REVERSE);
@@ -232,7 +238,7 @@ public class FellowshipTele extends OpMode {
         } else if(climbersFlipped) {
             ClimberServo.setPosition(0.3);
         }else {
-            ClimberServo.setPosition(0);
+            ClimberServo.setPosition(0.3);
         }
 if(gamepad2.left_bumper){
     RightHangServo.close();
@@ -316,31 +322,20 @@ if(mountainMode) {
         }
         RightHangServo.setPosition(desiredPosition+.01);
         LeftHangServo.setPosition(desiredPosition+offset);
-
-        if(gamepad1.right_trigger>triggerCutoff){
-            LeftHangMotor.setPower(.8);
-            RightHangMotor.setPower(.8);
-
-        }else if(gamepad1.left_trigger>triggerCutoff) {
-            LeftHangMotor.setPower(-.8);
-            RightHangMotor.setPower(-.8);
-        }else{
-            LeftHangMotor.setPower(0);
+        RightHangMotor.setPower(-gamepad1.right_stick_y);
+        LeftHangMotor.setPower(-gamepad1.right_stick_y);
+        if(Math.abs(gamepad1.right_stick_y)<.1){
             RightHangMotor.setPower(0);
-        }
-        if(gamepad1.back){
-            hanging=true;
-        }
-
-
-        if(hanging){
-            LeftHangServo.setPosition(mid+offset);
-            RightHangServo.setPosition(mid+0.01);
+            LeftHangMotor.setPower(0);
         }
 
         //telemetry section
         telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
         telemetry.addData("elevatorEncoder", DebrisMotor.getCurrentPosition());
+        telemetry.addData("red", floorSeeker.red());
+        telemetry.addData("green", floorSeeker.green());
+        telemetry.addData("blue", floorSeeker.blue());
+
 
     }
     @Override
