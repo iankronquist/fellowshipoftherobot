@@ -91,6 +91,7 @@ public class FellowshipRedAuto extends LinearOpMode {
         waitOneFullHardwareCycle();
         stopMotors();
         waitOneFullHardwareCycle();
+        telemetry.addData("angle", gyro.getHeading());
         gyroTurn(45,"right");
         waitOneFullHardwareCycle();
         stopMotors();
