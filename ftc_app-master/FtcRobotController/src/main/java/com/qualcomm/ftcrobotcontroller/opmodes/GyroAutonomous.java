@@ -41,9 +41,15 @@ public class GyroAutonomous extends LinearOpMode {
         double Targetfloat = Rot*EncoderPerRotation40;
         while(motorLeft.getCurrentPosition()>-Targetfloat||motorRight.getCurrentPosition()>-Targetfloat)
        // while(gyroSensor.getValue() < 500){
+<<<<<<< HEAD
         {   //telemetry.addData("AngleX", gyroSensor.rawX());
             //telemetry.addData("AngleY", gyroSensor.rawY());
             //telemetry.addData("AngleZ", gyroSensor.rawZ());
+=======
+        {   telemetry.addData("AngleX", gyroSensor.rawX());
+            telemetry.addData("AngleY", gyroSensor.rawY());
+            telemetry.addData("AngleZ", gyroSensor.rawZ());
+>>>>>>> origin/master
             motorLeft.setPower(0.25);
             motorRight.setPower(0.50);
         }
