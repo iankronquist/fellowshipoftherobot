@@ -24,15 +24,24 @@ public class FellowshipRedAuto extends LinearOpMode {
     Servo LeftTail;
     Servo RightHangServo;
     Servo LeftHangServo;
+    Servo beaconServo;
+    Servo LeftCowcatcher;
+    Servo RightCowcatcher;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     ColorSensor floorSeeker;
+    ColorSensor beaconSeeker;
     GyroSensor gyro;
     final double turnPower = 0;
     final double arcOffset = .9;
     final double movePower = .35;
     final double rollerPower = -.9;
     final double zero = .53;
+    final double cowcatcherOffset = .03;
+    final double higherPower = .4;
+    final double lowerPower = 0;
+    final double rightHit =.3;
+    final double leftHit = .7;
 
 
     public void stopMotors() throws InterruptedException{
@@ -57,22 +66,63 @@ public class FellowshipRedAuto extends LinearOpMode {
             waitOneFullHardwareCycle();
         }
     }
+    public void dumpClimbers() throws InterruptedException{
+        ClimberServo.setPosition(1);
+        Thread.sleep(500);
+        ClimberServo.setPosition(.8);
+        Thread.sleep(500);
+        ClimberServo.setPosition(1);
+    }
+    public void followLine() throws InterruptedException{
+        resetStartTime();
+        while (getRuntime() < 5) {
+            if (floorSeeker.green()>=10) {
+                motorLeft.setPower(lowerPower);
+                motorRight.setPower(higherPower);
+                waitOneFullHardwareCycle();
+            }
+
+            if (floorSeeker.green()<10) {
+                motorLeft.setPower(higherPower);
+                motorRight.setPower(lowerPower);
+                waitOneFullHardwareCycle();
+            }
+            waitOneFullHardwareCycle();
+        }
+
+    }
+    public void BackAway() throws InterruptedException{
+        motorLeft.setPower(-.8);
+        motorRight.setPower(-.5);
+        Thread.sleep(1000);
+    }
+
+    public void hitBeacon() throws InterruptedException {
+        if (beaconSeeker.red() > 8) {
+            beaconServo.setPosition(rightHit);
+        } else if (beaconSeeker.blue() > 8) {
+            beaconServo.setPosition(leftHit);
+        } else {
+            waitOneFullHardwareCycle();
+        }
+
+    }
+
     public void gyroTurn(int desiredAngle, String direction) throws InterruptedException{
 
         if (direction == "left") {
-            while (gyro.getHeading() > desiredAngle) {
-                double proportionalSpeed = .7+.3*((desiredAngle-gyro.getHeading())/desiredAngle);
-                motorLeft.setPower(proportionalSpeed);
-                motorRight.setPower(-proportionalSpeed);
+            while (Math.abs(desiredAngle - gyro.getHeading())>5) {
+                motorLeft.setPower(.8);
+                motorRight.setPower(-.8);
                 telemetry.addData("gyro", gyro.getHeading());
                 waitOneFullHardwareCycle();
             }
         }
         if (direction == "right") {
-            while (gyro.getHeading() < desiredAngle) {
-                double proportionalSpeed = .7+.3*((desiredAngle-gyro.getHeading())/desiredAngle);
-                motorLeft.setPower(-proportionalSpeed);
-                motorRight.setPower(proportionalSpeed);
+            while (Math.abs(desiredAngle -gyro.getHeading())>5) {
+
+                motorLeft.setPower(-.8);
+                motorRight.setPower(.8);
                 telemetry.addData("gyro", gyro.getHeading());
                 waitOneFullHardwareCycle();
             }
@@ -87,16 +137,47 @@ public class FellowshipRedAuto extends LinearOpMode {
         map();
         waitForStart();
         waitForNextHardwareCycle();
+        RollerMotor.setPower(rollerPower);
+        motorLeft.setPower(.8);
+        motorRight.setPower(.8);
+        Thread.sleep(500);
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        gyroTurn(315, "left");
+        waitOneFullHardwareCycle();
         findRedStripe();
         waitOneFullHardwareCycle();
         stopMotors();
         waitOneFullHardwareCycle();
         telemetry.addData("angle", gyro.getHeading());
-        gyroTurn(45,"right");
+        gyroTurn(0,"right");
         waitOneFullHardwareCycle();
         stopMotors();
         waitOneFullHardwareCycle();
         findWhiteStripe();
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        motorLeft.setPower(-.8);
+        motorRight.setPower(-.8);
+        Thread.sleep(250);
+        waitOneFullHardwareCycle();
+        stopMotors();
+        gyroTurn(270, "left");
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        followLine();
+        waitOneFullHardwareCycle();
+        Thread.sleep(500);
+        dumpClimbers();
+        waitOneFullHardwareCycle();
+        hitBeacon();
+        waitOneFullHardwareCycle();
+        Thread.sleep(500);
+        waitOneFullHardwareCycle();
+        BackAway();
         waitOneFullHardwareCycle();
         stopMotors();
 
@@ -127,7 +208,10 @@ public class FellowshipRedAuto extends LinearOpMode {
         ClimberServo = hardwareMap.servo.get("ClimberServo");
         HopperDoor = hardwareMap.servo.get("HopperDoor");
         HopperDoor.setPosition(.5);
+        beaconServo = hardwareMap.servo.get("beaconServo");
+        //beaconServo.setPosition(.5);
         floorSeeker = hardwareMap.colorSensor.get("floorSeeker");
+        beaconSeeker = hardwareMap.colorSensor.get("beaconSeeker");
         gyro = hardwareMap.gyroSensor.get("gyro");
         gyro.calibrate();
 
@@ -140,6 +224,9 @@ public class FellowshipRedAuto extends LinearOpMode {
         RightTail=hardwareMap.servo.get("RightTail");
         LeftTail =hardwareMap.servo.get("LeftTail");
         LeftTail.setDirection(Servo.Direction.REVERSE);
+        RightCowcatcher = hardwareMap.servo.get("RightCowcatcher");
+        LeftCowcatcher = hardwareMap.servo.get("LeftCowcatcher");
+        LeftCowcatcher.setDirection(Servo.Direction.REVERSE);
         waitOneFullHardwareCycle();
         ClimberServo.setPosition(0);
         LeftZipline.setPosition(.5);
@@ -150,6 +237,9 @@ public class FellowshipRedAuto extends LinearOpMode {
         waitOneFullHardwareCycle();
         RightHangServo.setPosition(zero+.01);
         LeftHangServo.setPosition(zero+.035);
+        waitOneFullHardwareCycle();
+        RightCowcatcher.setPosition(.7+cowcatcherOffset);
+        LeftCowcatcher.setPosition(.7);
         waitOneFullHardwareCycle();
     }
 
