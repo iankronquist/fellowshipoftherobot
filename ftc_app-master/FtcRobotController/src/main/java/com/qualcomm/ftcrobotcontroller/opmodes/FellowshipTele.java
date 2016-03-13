@@ -17,13 +17,13 @@ public class FellowshipTele extends OpMode {
     DcMotor RollerMotor;
     DcMotor RightHangMotor;
     DcMotor LeftHangMotor;
+    DcMotor RightTail;
+    DcMotor LeftTail;
     Servo LeftZipline;
     Servo RightZipline;
     Servo LiftServo;
     Servo ClimberServo;
     Servo HopperDoor;
-    Servo LeftTail;
-    Servo RightTail;
     Servo RightHangServo;
     Servo LeftHangServo;
     AnalogInput rollerPhotogate;
@@ -35,19 +35,21 @@ public class FellowshipTele extends OpMode {
     final double triggerCutoff = .2;
     final double power = .3;
     final double searchingPower = 0.1;
-    final double miniPower = 0.8;
+    final double miniPower = 1;
     boolean SearchingUp = false;
     boolean SearchingDown = false;
     boolean OpenFound = false;
     boolean climbersFlipped = false;
     boolean mountainMode = false;
     boolean hanging = false;
+    boolean allGood = false;
     int hangerPosition = 0;
     float smallPower = (float)miniPower;
     final double zero = .60;
     final double mid = .64;
-    final double high = .66;
+    final double high = .67;
     final double offset = 0.035;
+    final float mountainAngle = 107;
     double desiredPosition;
 
 
@@ -69,7 +71,13 @@ public class FellowshipTele extends OpMode {
     public void flipClimbers(){
         ClimberServo.setPosition(1);
     }
+public void setTailPosition(float angle){
+    int encoderPosition = (int) ((angle/360)*EncoderPerRotation60);
+    RightTail.setTargetPosition(encoderPosition);
+    LeftTail.setTargetPosition(encoderPosition);
 
+
+}
 
         public void LookForClip(){
         if(elevatorPhotogate.getValue()>=100) {
@@ -133,9 +141,9 @@ public class FellowshipTele extends OpMode {
         floorSeeker.enableLed(false);
         floorSeeker.enableLed(true);
 
-        RightTail=hardwareMap.servo.get("RightTail");
-        LeftTail =hardwareMap.servo.get("LeftTail");
-        LeftTail.setDirection(Servo.Direction.REVERSE);
+        RightTail=hardwareMap.dcMotor.get("RightTail");
+        LeftTail =hardwareMap.dcMotor.get("LeftTail");
+        LeftTail.setDirection(DcMotor.Direction.REVERSE);
         RightHangServo=hardwareMap.servo.get("RightHangServo");
         LeftHangServo =hardwareMap.servo.get("LeftHangServo");
         LeftHangServo.setDirection(Servo.Direction.REVERSE);
@@ -145,8 +153,21 @@ public class FellowshipTele extends OpMode {
         RightZipline.setPosition(.5);
         ClimberServo.setPosition(0);
         LiftServo.setPosition(.5);
-        LeftTail.setPosition(.15);
-        RightTail.setPosition(.15);
+        while(RightTail.getCurrentPosition()!=0) {
+            RightTail.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        }
+        while(LeftTail.getCurrentPosition()!=0) {
+            LeftTail.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        }
+        RightTail.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        LeftTail.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        RightTail.setTargetPosition(0);
+        RightTail.setPower(0);
+        LeftTail.setTargetPosition(0);
+        LeftTail.setPower(0);
+
+
+
         RightHangServo.setPosition(zero+.01);
         LeftHangServo.setPosition(zero+offset);
     }
@@ -154,6 +175,8 @@ public class FellowshipTele extends OpMode {
     @Override
     public void loop() {
         DebrisMotor.setPower(.035);
+        RightTail.setPower(.25);
+        LeftTail.setPower(.25);
         boolean ready = (RightHangServo.getPosition() == desiredPosition||LeftHangServo.getPosition()==desiredPosition);
         //drive code
         //may need change, this is from FTC
@@ -240,9 +263,13 @@ public class FellowshipTele extends OpMode {
         }else {
             ClimberServo.setPosition(0.3);
         }
-if(gamepad2.left_bumper){
-    RightHangServo.close();
-    LeftHangServo.close();
+        if(gamepad1.back){
+            allGood = true;
+        }
+
+if(allGood){
+    RightHangServo.setPosition(mid);
+    LeftHangServo.setPosition(mid);
 }
 //Hopper Door code
         if ((Math.abs(DebrisMotor.getCurrentPosition()) * 360 / EncoderPerRotation60) >= minAngle) {
@@ -297,12 +324,15 @@ if(SearchingDown&&SearchingUp){
         if(gamepad1.x){
             mountainMode = false;
         }
+
+
 if(mountainMode) {
-    RightTail.setPosition(1);
-    LeftTail.setPosition(1);
+
+    setTailPosition(mountainAngle);
+
+
 } else{
-    RightTail.setPosition(.15);
-    LeftTail.setPosition(.15);
+   setTailPosition(0);
 }
         //hangers
         if(gamepad1.dpad_up&&hangerPosition !=2){

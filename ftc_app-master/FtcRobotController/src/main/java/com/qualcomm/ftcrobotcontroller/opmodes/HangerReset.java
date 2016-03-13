@@ -20,8 +20,6 @@ public class HangerReset extends OpMode {
     Servo LiftServo;
     Servo ClimberServo;
     Servo HopperDoor;
-    Servo LeftTail;
-    Servo RightTail;
     Servo RightHangServo;
     Servo LeftHangServo;
     AnalogInput rollerPhotogate;
@@ -67,9 +65,6 @@ public class HangerReset extends OpMode {
         ClimberServo = hardwareMap.servo.get("ClimberServo");
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
-        RightTail=hardwareMap.servo.get("RightTail");
-        LeftTail =hardwareMap.servo.get("LeftTail");
-        LeftTail.setDirection(Servo.Direction.REVERSE);
         RightHangServo=hardwareMap.servo.get("RightHangServo");
         LeftHangServo =hardwareMap.servo.get("LeftHangServo");
         LeftHangServo.setDirection(Servo.Direction.REVERSE);
@@ -79,8 +74,6 @@ public class HangerReset extends OpMode {
         RightZipline.setPosition(.5);
         ClimberServo.setPosition(0);
         LiftServo.setPosition(.5);
-        LeftTail.setPosition(.15);
-        RightTail.setPosition(.15);
         RightHangServo.setPosition(high);
         LeftHangServo.setPosition(high+offset);
     }

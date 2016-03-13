@@ -15,13 +15,13 @@ public class FellowshipRedAuto extends LinearOpMode {
     DcMotor motorLeft;
     DcMotor DebrisMotor;
     DcMotor RollerMotor;
+    DcMotor RightTail;
+    DcMotor LeftTail;
     Servo LeftZipline;
     Servo RightZipline;
     Servo ClimberServo;
     Servo HopperDoor;
     Servo LiftServo;
-    Servo RightTail;
-    Servo LeftTail;
     Servo RightHangServo;
     Servo LeftHangServo;
     Servo beaconServo;
@@ -39,7 +39,7 @@ public class FellowshipRedAuto extends LinearOpMode {
     final double zero = .53;
     final double cowcatcherOffset = .03;
     final double higherPower = .4;
-    final double lowerPower = 0;
+    final double lowerPower = .1;
     final double rightHit =.3;
     final double leftHit = .7;
 
@@ -75,7 +75,7 @@ public class FellowshipRedAuto extends LinearOpMode {
     }
     public void followLine() throws InterruptedException{
         resetStartTime();
-        while (getRuntime() < 5) {
+        while (getRuntime() < 2.5) {
             if (floorSeeker.green()>=10) {
                 motorLeft.setPower(lowerPower);
                 motorRight.setPower(higherPower);
@@ -151,7 +151,7 @@ public class FellowshipRedAuto extends LinearOpMode {
         stopMotors();
         waitOneFullHardwareCycle();
         telemetry.addData("angle", gyro.getHeading());
-        gyroTurn(0,"right");
+        gyroTurn(0, "right");
         waitOneFullHardwareCycle();
         stopMotors();
         waitOneFullHardwareCycle();
@@ -159,11 +159,16 @@ public class FellowshipRedAuto extends LinearOpMode {
         waitOneFullHardwareCycle();
         stopMotors();
         waitOneFullHardwareCycle();
+        Thread.sleep(500);
+        waitOneFullHardwareCycle();
         motorLeft.setPower(-.8);
         motorRight.setPower(-.8);
-        Thread.sleep(250);
+        Thread.sleep(350);
         waitOneFullHardwareCycle();
         stopMotors();
+        waitOneFullHardwareCycle();
+        Thread.sleep(500);
+        waitOneFullHardwareCycle();
         gyroTurn(270, "left");
         waitOneFullHardwareCycle();
         stopMotors();
@@ -175,7 +180,7 @@ public class FellowshipRedAuto extends LinearOpMode {
         waitOneFullHardwareCycle();
         hitBeacon();
         waitOneFullHardwareCycle();
-        Thread.sleep(500);
+        Thread.sleep(1000);
         waitOneFullHardwareCycle();
         BackAway();
         waitOneFullHardwareCycle();
@@ -221,9 +226,9 @@ public class FellowshipRedAuto extends LinearOpMode {
         LeftHangServo.setDirection(Servo.Direction.REVERSE);
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
-        RightTail=hardwareMap.servo.get("RightTail");
-        LeftTail =hardwareMap.servo.get("LeftTail");
-        LeftTail.setDirection(Servo.Direction.REVERSE);
+        RightTail=hardwareMap.dcMotor.get("RightTail");
+        LeftTail =hardwareMap.dcMotor.get("LeftTail");
+        LeftTail.setDirection(DcMotor.Direction.REVERSE);
         RightCowcatcher = hardwareMap.servo.get("RightCowcatcher");
         LeftCowcatcher = hardwareMap.servo.get("LeftCowcatcher");
         LeftCowcatcher.setDirection(Servo.Direction.REVERSE);
@@ -232,8 +237,20 @@ public class FellowshipRedAuto extends LinearOpMode {
         LeftZipline.setPosition(.5);
         RightZipline.setPosition(.5);
         waitOneFullHardwareCycle();
-        RightTail.setPosition(0);
-        LeftTail.setPosition(0);
+        while(RightTail.getCurrentPosition()!=0) {
+            RightTail.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            waitOneFullHardwareCycle();
+        }
+        while(LeftTail.getCurrentPosition()!=0) {
+            LeftTail.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            waitOneFullHardwareCycle();
+        }
+        RightTail.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        LeftTail.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        RightTail.setTargetPosition(0);
+        RightTail.setPower(0);
+        LeftTail.setTargetPosition(0);
+        LeftTail.setPower(0);
         waitOneFullHardwareCycle();
         RightHangServo.setPosition(zero+.01);
         LeftHangServo.setPosition(zero+.035);
