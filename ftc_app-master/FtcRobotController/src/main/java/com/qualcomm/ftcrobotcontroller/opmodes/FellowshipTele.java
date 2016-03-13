@@ -26,6 +26,8 @@ public class FellowshipTele extends OpMode {
     Servo RightTail;
     Servo RightHangServo;
     Servo LeftHangServo;
+    Servo LeftCowcatcher;
+    Servo RightCowcatcher;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     ColorSensor floorSeeker;
@@ -36,6 +38,8 @@ public class FellowshipTele extends OpMode {
     final double power = .3;
     final double searchingPower = 0.1;
     final double miniPower = 0.8;
+    final double MountainPosition = .6;
+    final double cowcatcherOffset = .03;
     boolean SearchingUp = false;
     boolean SearchingDown = false;
     boolean OpenFound = false;
@@ -140,6 +144,11 @@ public class FellowshipTele extends OpMode {
         LeftHangServo =hardwareMap.servo.get("LeftHangServo");
         LeftHangServo.setDirection(Servo.Direction.REVERSE);
         HopperDoor = hardwareMap.servo.get("HopperDoor");
+        LeftCowcatcher = hardwareMap.servo.get("LeftCowcatcher");
+        RightCowcatcher = hardwareMap.servo.get("RightCowcatcher");
+        LeftCowcatcher.setDirection(Servo.Direction.REVERSE);
+        RightCowcatcher.setPosition(.5);
+        LeftCowcatcher.setPosition(.5);
         HopperDoor.setPosition(.5);
         LeftZipline.setPosition(.5);
         RightZipline.setPosition(.5);
@@ -219,7 +228,13 @@ public class FellowshipTele extends OpMode {
             DebrisMotor.setTargetPosition(0);
         }
 
-
+        if(gamepad1.b){
+            RightCowcatcher.setPosition(.7+cowcatcherOffset);
+            LeftCowcatcher.setPosition(.7);
+        }else{
+            RightCowcatcher.setPosition(.5);
+            LeftCowcatcher.setPosition(.5);
+        }
         //Roller Code
         //when trigger is pressed, power is set
         if (gamepad2.right_trigger > triggerCutoff) {
@@ -300,6 +315,8 @@ if(SearchingDown&&SearchingUp){
 if(mountainMode) {
     RightTail.setPosition(1);
     LeftTail.setPosition(1);
+    RightCowcatcher.setPosition(MountainPosition);
+    LeftCowcatcher.setPosition(MountainPosition);
 } else{
     RightTail.setPosition(.15);
     LeftTail.setPosition(.15);
