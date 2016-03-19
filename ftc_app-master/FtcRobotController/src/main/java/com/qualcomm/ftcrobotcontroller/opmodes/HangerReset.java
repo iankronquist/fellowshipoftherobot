@@ -22,12 +22,16 @@ public class HangerReset extends OpMode {
     Servo HopperDoor;
     Servo RightHangServo;
     Servo LeftHangServo;
+    Servo RightCowcatcher;
+    Servo LeftCowcatcher;
+    Servo LeftTail;
+    Servo RightTail;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
 
     final double power = .3;
-
-
+    final double tailOffset = .16;
+    final double cowcatcherOffset = .03;
     final double zero = .63;
     final double high = .66;
     final double offset = 0.035;
@@ -55,6 +59,12 @@ public class HangerReset extends OpMode {
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
         DebrisMotor.setPower(0);
+        LeftCowcatcher = hardwareMap.servo.get("LeftCowcatcher");
+        RightCowcatcher = hardwareMap.servo.get("RightCowcatcher");
+        LeftCowcatcher.setDirection(Servo.Direction.REVERSE);
+        RightTail=hardwareMap.servo.get("RightTail");
+        LeftTail =hardwareMap.servo.get("LeftTail");
+        LeftTail.setDirection(Servo.Direction.REVERSE);
         LeftHangMotor = hardwareMap.dcMotor.get("LeftHangMotor");
         RightHangMotor = hardwareMap.dcMotor.get("RightHangMotor");
         LeftHangMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -74,6 +84,10 @@ public class HangerReset extends OpMode {
         RightZipline.setPosition(.5);
         ClimberServo.setPosition(0);
         LiftServo.setPosition(.5);
+        LeftTail.setPosition(.15);
+        RightTail.setPosition(.15+tailOffset);
+        RightCowcatcher.setPosition(.38+cowcatcherOffset);
+        LeftCowcatcher.setPosition(.38);
         RightHangServo.setPosition(high);
         LeftHangServo.setPosition(high+offset);
     }

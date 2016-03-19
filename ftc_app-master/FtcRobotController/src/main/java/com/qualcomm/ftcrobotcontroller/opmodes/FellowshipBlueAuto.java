@@ -1,8 +1,10 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
@@ -18,172 +20,127 @@ public class FellowshipBlueAuto extends LinearOpMode {
     Servo ClimberServo;
     Servo HopperDoor;
     Servo LiftServo;
+    Servo RightHangServo;
+    Servo LeftHangServo;
+    Servo beaconServo;
+    Servo LeftCowcatcher;
+    Servo RightCowcatcher;
+    Servo RightTail;
+    Servo LeftTail;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
-    final float EncoderPerRotation = 1680;
-    final float EncoderPerRotation40 = 1120;
-    final double power = .9;
-    final double searchingPower = 0.1;
-    final double movePower = 0.01;
-    boolean OpenFound = false;
-    boolean OpenFound2  = false;
-    boolean OpenFound3 = false;
-    boolean done = false;
-    boolean done2 = false;
-    boolean done3 = false;
+    ColorSensor floorSeeker;
+    ColorSensor beaconSeeker;
+    GyroSensor gyro;
+    final double turnPower = 0;
+    final double arcOffset = .9;
+    final double movePower = .35;
+    final double rollerPower = -.9;
+    final double zero = .53;
+    final double cowcatcherOffset = .03;
+    final double higherPower = .3;
+    final double lowerPower = .2;
+    final double rightHit =.3;
+    final double leftHit = .7;
+    final double tailOffset = .16;
 
-    public void forward(double ForwardPower, double Rot) throws InterruptedException{
-        resetEncoders();
-        double Targetfloat = Rot*EncoderPerRotation40;
-        while(motorLeft.getCurrentPosition()>-Targetfloat||motorRight.getCurrentPosition()>-Targetfloat){
-            motorLeft.setPower(ForwardPower);
-            motorRight.setPower(ForwardPower);}
+
+    public void stopMotors() throws InterruptedException{
         motorLeft.setPower(0);
+        waitOneFullHardwareCycle();
         motorRight.setPower(0);
-        telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
         waitOneFullHardwareCycle();
     }
 
-    public void turnLeft(double TurnPower, double Rot) throws InterruptedException{
-        resetEncoders();
-        double Targetfloat = Rot*EncoderPerRotation40;
-        while(motorLeft.getCurrentPosition()<Targetfloat||motorRight.getCurrentPosition()>-Targetfloat){
-            telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
-            motorLeft.setPower(TurnPower);
-            motorRight.setPower(-TurnPower);
-            telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
-            waitOneFullHardwareCycle();
-        }
-    }
-    public void turnRight(double TurnPower, double Rot) throws InterruptedException{
-        resetEncoders();
-        double Targetfloat = Rot*EncoderPerRotation40;
-        while(motorLeft.getCurrentPosition()>-Targetfloat||motorRight.getCurrentPosition()<Targetfloat){
-            motorLeft.setPower(-TurnPower);
-            motorRight.setPower(TurnPower);
-            waitOneFullHardwareCycle();
-        }
-    }
 
-    public void stopMotors(){
-        motorLeft.setPower(0);
-        motorRight.setPower(0);
-    }
-
-    public void RollerStop() throws InterruptedException {
-        while(rollerPhotogate.getValue() < 500){
-            RollerMotor.setPower(-searchingPower);
+    public void findRedStripe() throws InterruptedException {
+        while (floorSeeker.red() < 7) {
+            motorLeft.setPower(.6);
+            motorRight.setPower(.6);
             waitOneFullHardwareCycle();
         }
-        RollerMotor.setPower(0);
-
     }
-
-
-    public void LookForClip(){
-        if(elevatorPhotogate.getValue()>=100) {
-            ElevatorStop();
-            done =true;
-        }
-    }
-    public void LookForClip2(){
-        if(elevatorPhotogate.getValue()>=100) {
-            ElevatorStop();
-            done2 =true;
-        }
-    }
-    public void LookForClip3(){
-        if(elevatorPhotogate.getValue()>=100) {
-            ElevatorStop();
-            done3 =true;
-        }
-    }
-    public void FindOpen(){
-        if(elevatorPhotogate.getValue() <= 30){
-            OpenFound = true;
-        }
-    }
-    public void FindOpen2(){
-        if(elevatorPhotogate.getValue() <= 30){
-            OpenFound2 = true;
-        }
-    }
-    public void FindOpen3(){
-        if(elevatorPhotogate.getValue() <= 30){
-            OpenFound3 = true;
-        }
-    }
-    public void RaiseHopper() throws InterruptedException{
-        while(!OpenFound && !done) {
-            LiftServo.setPosition(0);
-            FindOpen();
-            waitOneFullHardwareCycle();
-        }
-        while(OpenFound && !done) {
-            LookForClip();
-            waitOneFullHardwareCycle();
-        }
-
-        while (done && !OpenFound2) {
-            LiftServo.setPosition(0);
-            FindOpen2();
-            waitOneFullHardwareCycle();
-        }
-        while(OpenFound2&&!done2){
-            LookForClip2();
-            waitOneFullHardwareCycle();
-        }
-        while(done2&&!OpenFound3){
-            LiftServo.setPosition(0);
-            FindOpen3();
-            waitOneFullHardwareCycle();
-        }
-        while(OpenFound3&&!done3){
-            LookForClip3();
+    public void findBlueStripe() throws InterruptedException{
+        while(floorSeeker.blue()<7){
+            motorLeft.setPower(.6);
+            motorRight.setPower(.6);
             waitOneFullHardwareCycle();
         }
 
 
 
-
-
-
-
     }
-
-    public void AutoFlip() throws InterruptedException{
+    public void findWhiteStripe() throws InterruptedException {
+        while (floorSeeker.green() < 10) {
+            motorLeft.setPower(.6);
+            motorRight.setPower(.6);
+            waitOneFullHardwareCycle();
+        }
+    }
+    public void dumpClimbers() throws InterruptedException{
         ClimberServo.setPosition(1);
-        waitOneFullHardwareCycle();
+        Thread.sleep(500);
+        ClimberServo.setPosition(.8);
+        Thread.sleep(500);
+        ClimberServo.setPosition(1);
+    }
+    public void followLine(double meme) throws InterruptedException{
+        resetStartTime();
+        while (getRuntime() < meme) {
+            if (floorSeeker.green()>=10) {
+                motorLeft.setPower(lowerPower);
+                motorRight.setPower(higherPower);
+                waitOneFullHardwareCycle();
+            }
 
-
+            if (floorSeeker.green()<10) {
+                motorLeft.setPower(higherPower);
+                motorRight.setPower(lowerPower);
+                waitOneFullHardwareCycle();
+            }
+            waitOneFullHardwareCycle();
+        }
 
     }
-
-
-
-    public void ElevatorStop() {
-        LiftServo.setPosition(.5);
-    }
-
-
-    public void resetEncoders() throws InterruptedException{
-        waitOneFullHardwareCycle();
-        motorLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        motorRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        waitOneFullHardwareCycle();
-        motorLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        motorRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        waitOneFullHardwareCycle();
-    }
-
-    public void LastForward() throws InterruptedException{
-        motorLeft.setPower(.69);
-        motorRight.setPower(.69);
+    public void BackAway() throws InterruptedException{
+        motorLeft.setPower(-.8);
+        motorRight.setPower(-.5);
         Thread.sleep(1000);
-        stopMotors();
     }
 
+    public void hitBeacon() throws InterruptedException {
+        if (beaconSeeker.red() > 8) {
+            beaconServo.setPosition(rightHit);
+            telemetry.addData("red", arcOffset);
+        } else if (beaconSeeker.blue() > 8) {
+            beaconServo.setPosition(leftHit);
+            telemetry.addData("blue", arcOffset);
+        } else {
+            waitOneFullHardwareCycle();
+        }
 
+    }
+
+    public void gyroTurn(int desiredAngle, String direction) throws InterruptedException{
+
+        if (direction == "left") {
+            while (Math.abs(desiredAngle - gyro.getHeading())>5) {
+                motorLeft.setPower(.8);
+                motorRight.setPower(-.8);
+                telemetry.addData("gyro", gyro.getHeading());
+                waitOneFullHardwareCycle();
+            }
+        }
+        if (direction == "right") {
+            while (Math.abs(desiredAngle -gyro.getHeading())>5) {
+
+                motorLeft.setPower(-.8);
+                motorRight.setPower(.8);
+                telemetry.addData("gyro", gyro.getHeading());
+                waitOneFullHardwareCycle();
+            }
+        }
+    }
 
 
 
@@ -191,30 +148,80 @@ public class FellowshipBlueAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         map();
-        telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
-        telemetry.addData("RightEncoder", motorRight.getCurrentPosition());
         waitForStart();
         waitForNextHardwareCycle();
-        RollerStop();
-        RaiseHopper();
-        resetEncoders();
-        RollerMotor.setPower(-.9);
-        forward(movePower, 1);
+        RollerMotor.setPower(rollerPower);
+        motorLeft.setPower(.8);
+        motorRight.setPower(.8);
+        Thread.sleep(500);
         waitOneFullHardwareCycle();
-        resetEncoders();
-        turnRight(movePower, 0.6);
-        waitOneFullHardwareCycle();
-        resetEncoders();
-        forward(movePower, 10.6);
-        waitOneFullHardwareCycle();
-        resetEncoders();
-        //turnRight(.69, .85);
-        waitOneFullHardwareCycle();
-        //LastForward();
-        waitOneFullHardwareCycle();
-        //AutoFlip();
-        //waitOneFullHardwareCycle();
         stopMotors();
+        waitOneFullHardwareCycle();
+        gyroTurn(38, "right");
+        waitOneFullHardwareCycle();
+        findBlueStripe();;
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        telemetry.addData("angle", gyro.getHeading());
+        gyroTurn(0, "left");
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        findWhiteStripe();
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        motorLeft.setPower(-.8);
+        motorRight.setPower(-.8);
+        Thread.sleep(200);
+        waitOneFullHardwareCycle();
+        stopMotors();
+        Thread.sleep(350);
+        waitOneFullHardwareCycle();
+        motorLeft.setPower(-.8);
+        motorRight.setPower(-.8);
+        Thread.sleep(200);
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        Thread.sleep(500);
+        waitOneFullHardwareCycle();
+        gyroTurn(85, "right");
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        followLine(1.8);
+        // RightCowcatcher.setPosition(.38 +cowcatcherOffset);
+        // LeftCowcatcher.setPosition(.38);
+        waitOneFullHardwareCycle();
+        RollerMotor.setPower(0);
+        waitOneFullHardwareCycle();
+        motorRight.setPower(.6);
+        motorLeft.setPower(.6);
+        waitOneFullHardwareCycle();
+        Thread.sleep(500);
+        waitOneFullHardwareCycle();
+        stopMotors();
+        waitOneFullHardwareCycle();
+        Thread.sleep(500);
+        dumpClimbers();
+        waitOneFullHardwareCycle();
+        beaconSeeker.enableLed(false);
+        Thread.sleep(500);
+        beaconSeeker.enableLed(true);
+        Thread.sleep(500);
+        beaconSeeker.enableLed(false);
+        telemetry.addData("red", beaconSeeker.red());
+        telemetry.addData("blue", beaconSeeker.blue());
+        hitBeacon();
+        waitOneFullHardwareCycle();
+        Thread.sleep(1000);
+        waitOneFullHardwareCycle();
+        BackAway();
+        waitOneFullHardwareCycle();
+        stopMotors();
+
     }
 
 
@@ -229,12 +236,9 @@ public class FellowshipBlueAuto extends LinearOpMode {
         LeftZipline = hardwareMap.servo.get("LeftZipline");
         RightZipline = hardwareMap.servo.get("RightZipline");
         RightZipline.setDirection(Servo.Direction.REVERSE);
-        motorLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        motorRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         waitOneFullHardwareCycle();
-        telemetry.addData("LeftEncoder", motorLeft.getCurrentPosition());
-        motorLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        motorRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        motorLeft.setMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
+        motorRight.setMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
         DebrisMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         //may need a wait
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
@@ -245,12 +249,44 @@ public class FellowshipBlueAuto extends LinearOpMode {
         ClimberServo = hardwareMap.servo.get("ClimberServo");
         HopperDoor = hardwareMap.servo.get("HopperDoor");
         HopperDoor.setPosition(.5);
+        beaconServo = hardwareMap.servo.get("beaconServo");
+        beaconServo.setPosition(.5);
+        floorSeeker = hardwareMap.colorSensor.get("floorSeeker");
+        beaconSeeker = hardwareMap.colorSensor.get("beaconSeeker");
+        beaconSeeker.setI2cAddress(0x70);
+        beaconSeeker.enableLed(true);
+        waitOneFullHardwareCycle();
+        beaconSeeker.enableLed(false);
+        beaconSeeker.enableLed(true);
+        beaconSeeker.enableLed(false);
+        gyro = hardwareMap.gyroSensor.get("gyro");
+        gyro.calibrate();
+
         //ClimberServo.setPosition(0.5);
+        RightHangServo = hardwareMap.servo.get("RightHangServo");
+        LeftHangServo  = hardwareMap.servo.get("LeftHangServo");
+        LeftHangServo.setDirection(Servo.Direction.REVERSE);
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
+        RightTail=hardwareMap.servo.get("RightTail");
+        LeftTail =hardwareMap.servo.get("LeftTail");
+        LeftTail.setDirection(Servo.Direction.REVERSE);
+        RightCowcatcher = hardwareMap.servo.get("RightCowcatcher");
+        LeftCowcatcher = hardwareMap.servo.get("LeftCowcatcher");
+        LeftCowcatcher.setDirection(Servo.Direction.REVERSE);
+        waitOneFullHardwareCycle();
         ClimberServo.setPosition(0);
         LeftZipline.setPosition(.5);
         RightZipline.setPosition(.5);
+        waitOneFullHardwareCycle();
+        RightTail.setPosition(0.07);
+        LeftTail.setPosition(0.07+tailOffset);
+        waitOneFullHardwareCycle();
+        RightHangServo.setPosition(zero+.01);
+        LeftHangServo.setPosition(zero+.035);
+        waitOneFullHardwareCycle();
+        RightCowcatcher.setPosition(.77+cowcatcherOffset);
+        LeftCowcatcher.setPosition(.77);
         waitOneFullHardwareCycle();
     }
 

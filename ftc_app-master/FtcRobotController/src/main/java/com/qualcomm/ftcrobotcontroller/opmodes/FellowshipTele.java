@@ -17,8 +17,6 @@ public class FellowshipTele extends OpMode {
     DcMotor RollerMotor;
     DcMotor RightHangMotor;
     DcMotor LeftHangMotor;
-    DcMotor RightTail;
-    DcMotor LeftTail;
     Servo LeftZipline;
     Servo RightZipline;
     Servo LiftServo;
@@ -26,9 +24,15 @@ public class FellowshipTele extends OpMode {
     Servo HopperDoor;
     Servo RightHangServo;
     Servo LeftHangServo;
+    Servo beaconServo;
+    Servo LeftTail;
+    Servo RightTail;
+    Servo LeftCowcatcher;
+    Servo RightCowcatcher;
     AnalogInput rollerPhotogate;
     AnalogInput elevatorPhotogate;
     ColorSensor floorSeeker;
+    ColorSensor beaconSeeker;
     final float EncoderPerRotation60 = 1680;
     final float maxAngle = 35;
     final float minAngle = 32;
@@ -36,6 +40,8 @@ public class FellowshipTele extends OpMode {
     final double power = .3;
     final double searchingPower = 0.1;
     final double miniPower = 1;
+    final double cowcatcherOffset = .03;
+    final double tailOffset = .16;
     boolean SearchingUp = false;
     boolean SearchingDown = false;
     boolean OpenFound = false;
@@ -71,13 +77,13 @@ public class FellowshipTele extends OpMode {
     public void flipClimbers(){
         ClimberServo.setPosition(1);
     }
-public void setTailPosition(float angle){
+/*public void setTailPosition(float angle){
     int encoderPosition = (int) ((angle/360)*EncoderPerRotation60);
     RightTail.setTargetPosition(encoderPosition);
     LeftTail.setTargetPosition(encoderPosition);
 
 
-}
+}*/
 
         public void LookForClip(){
         if(elevatorPhotogate.getValue()>=100) {
@@ -127,23 +133,33 @@ public void setTailPosition(float angle){
         DebrisMotor.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         DebrisMotor.setTargetPosition(0);
         DebrisMotor.setPower(0);
+        RightTail=hardwareMap.servo.get("RightTail");
+        LeftTail =hardwareMap.servo.get("LeftTail");
+        LeftTail.setDirection(Servo.Direction.REVERSE);
         LeftHangMotor = hardwareMap.dcMotor.get("LeftHangMotor");
         RightHangMotor = hardwareMap.dcMotor.get("RightHangMotor");
         LeftHangMotor.setDirection(DcMotor.Direction.REVERSE);
         LeftZipline = hardwareMap.servo.get("LeftZipline");
         RightZipline = hardwareMap.servo.get("RightZipline");
         RightZipline.setDirection(Servo.Direction.REVERSE);
+        LeftCowcatcher = hardwareMap.servo.get("LeftCowcatcher");
+        RightCowcatcher = hardwareMap.servo.get("RightCowcatcher");
+        LeftCowcatcher.setDirection(Servo.Direction.REVERSE);
         LiftServo = hardwareMap.servo.get("LiftServo");
         ClimberServo = hardwareMap.servo.get("ClimberServo");
+        beaconServo = hardwareMap.servo.get("beaconServo");
+        beaconServo.setPosition(.5);
+        beaconSeeker=hardwareMap.colorSensor.get("beaconSeeker");
+        beaconSeeker.setI2cAddress(0x70);
         rollerPhotogate = hardwareMap.analogInput.get("rollerPhotogate");
         elevatorPhotogate = hardwareMap.analogInput.get("elevatorPhotogate");
         floorSeeker = hardwareMap.colorSensor.get("floorSeeker");
         floorSeeker.enableLed(false);
         floorSeeker.enableLed(true);
 
-        RightTail=hardwareMap.dcMotor.get("RightTail");
+        /*RightTail=hardwareMap.dcMotor.get("RightTail");
         LeftTail =hardwareMap.dcMotor.get("LeftTail");
-        LeftTail.setDirection(DcMotor.Direction.REVERSE);
+        LeftTail.setDirection(DcMotor.Direction.REVERSE);*/
         RightHangServo=hardwareMap.servo.get("RightHangServo");
         LeftHangServo =hardwareMap.servo.get("LeftHangServo");
         LeftHangServo.setDirection(Servo.Direction.REVERSE);
@@ -153,20 +169,11 @@ public void setTailPosition(float angle){
         RightZipline.setPosition(.5);
         ClimberServo.setPosition(0);
         LiftServo.setPosition(.5);
-        while(RightTail.getCurrentPosition()!=0) {
-            RightTail.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        }
-        while(LeftTail.getCurrentPosition()!=0) {
-            LeftTail.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        }
-        RightTail.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        LeftTail.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        RightTail.setTargetPosition(0);
-        RightTail.setPower(0);
-        LeftTail.setTargetPosition(0);
-        LeftTail.setPower(0);
+        LeftTail.setPosition(.15);
+        RightTail.setPosition(.15);
 
-
+        RightCowcatcher.setPosition(.38+cowcatcherOffset);
+        LeftCowcatcher.setPosition(.38);
 
         RightHangServo.setPosition(zero+.01);
         LeftHangServo.setPosition(zero+offset);
@@ -175,8 +182,8 @@ public void setTailPosition(float angle){
     @Override
     public void loop() {
         DebrisMotor.setPower(.035);
-        RightTail.setPower(.25);
-        LeftTail.setPower(.25);
+        //RightTail.setPower(.25);
+        //LeftTail.setPower(.25);
         boolean ready = (RightHangServo.getPosition() == desiredPosition||LeftHangServo.getPosition()==desiredPosition);
         //drive code
         //may need change, this is from FTC
@@ -263,14 +270,7 @@ public void setTailPosition(float angle){
         }else {
             ClimberServo.setPosition(0.3);
         }
-        if(gamepad1.back){
-            allGood = true;
-        }
 
-if(allGood){
-    RightHangServo.setPosition(mid);
-    LeftHangServo.setPosition(mid);
-}
 //Hopper Door code
         if ((Math.abs(DebrisMotor.getCurrentPosition()) * 360 / EncoderPerRotation60) >= minAngle) {
             OpenDoors();
@@ -292,6 +292,34 @@ if(allGood){
         }else {
             UnBrake();
     }
+
+if(Math.abs(gamepad2.left_stick_x)>.2){
+    LeftCowcatcher.setPosition(.6);
+    RightCowcatcher.setPosition(.6+cowcatcherOffset);
+}else if(allGood) {
+
+    LeftCowcatcher.setPosition(.6);
+    RightCowcatcher.setPosition(.6+cowcatcherOffset);
+}else {
+
+        RightCowcatcher.setPosition(.38 + cowcatcherOffset);
+        LeftCowcatcher.setPosition(.38);
+
+    }
+
+
+
+        if(gamepad2.back){
+            allGood=true;
+        }
+
+        if(allGood){
+            RightHangServo.setPosition(mid);
+            LeftHangServo.setPosition(mid);
+
+
+
+        }
 
 
 if(SearchingUp&&!OpenFound){
@@ -325,14 +353,22 @@ if(SearchingDown&&SearchingUp){
             mountainMode = false;
         }
 
-
+if(gamepad1.dpad_left) {
+    beaconServo.setPosition(.3);
+} else if(gamepad1.dpad_right){
+            beaconServo.setPosition(.7);
+        }else{
+    beaconServo.setPosition(.5);
+        }
 if(mountainMode) {
 
-    setTailPosition(mountainAngle);
+    RightTail.setPosition(1);
+    LeftTail.setPosition(.93);
 
 
 } else{
-   setTailPosition(0);
+    RightTail.setPosition(.15);
+    LeftTail.setPosition(.15+tailOffset);
 }
         //hangers
         if(gamepad1.dpad_up&&hangerPosition !=2){
@@ -350,21 +386,25 @@ if(mountainMode) {
         if(hangerPosition == 2){
             desiredPosition = high;
         }
-        RightHangServo.setPosition(desiredPosition+.01);
-        LeftHangServo.setPosition(desiredPosition+offset);
+        RightHangServo.setPosition(desiredPosition + .01);
+        LeftHangServo.setPosition(desiredPosition + offset);
         RightHangMotor.setPower(-gamepad1.right_stick_y);
         LeftHangMotor.setPower(-gamepad1.right_stick_y);
         if(Math.abs(gamepad1.right_stick_y)<.1){
             RightHangMotor.setPower(0);
             LeftHangMotor.setPower(0);
         }
+        beaconSeeker.enableLed(true);
+        beaconSeeker.enableLed(false);
 
         //telemetry section
         telemetry.addData("elevatorGate", elevatorPhotogate.getValue());
         telemetry.addData("elevatorEncoder", DebrisMotor.getCurrentPosition());
-        telemetry.addData("red", floorSeeker.red());
-        telemetry.addData("green", floorSeeker.green());
-        telemetry.addData("blue", floorSeeker.blue());
+        telemetry.addData("red", beaconSeeker.red());
+        telemetry.addData("green", beaconSeeker.green());
+        telemetry.addData("blue", beaconSeeker.blue());
+
+
 
 
     }
